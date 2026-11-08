@@ -253,9 +253,81 @@ h1, h2, h3, .display-1, .display-2, .display-3, .display-4, .display-5 { letter-
     linear-gradient(180deg, rgba(3, 43, 31, .35) 0%, rgba(3, 43, 31, 0) 25%); }
 }
 
-// Hero photo framing: keep the farmer in view on every screen size
-.fl-hero-img { object-position: 74% 0%; transform-origin: 70% 20%; }
-@include media-breakpoint-up(lg) { .fl-hero-img { object-position: center 0%; } }
+// Hero slideshow: crossfade with a slow zoom; framing set per slide via --pos / --pos-lg
+.fl-hero-slide {
+  object-position: var(--pos, center); opacity: 0; transform: scale(1.08);
+  transition: opacity 1.4s ease, transform 8s linear;
+}
+.fl-hero-slide.active { opacity: 1; transform: scale(1); }
+@include media-breakpoint-up(lg) { .fl-hero-slide { object-position: var(--pos-lg, center); } }
+
+.fl-dots { display: flex; gap: .25rem; z-index: 2;
+  button { background: none; border: 0; padding: .6rem .15rem; cursor: pointer; }
+  span { display: block; width: 1.75rem; height: .25rem; border-radius: 1rem; background: rgba(255, 255, 255, .45); transition: width .35s ease, background-color .35s ease; }
+  button.active span { width: 2.75rem; background: var(--fl-lime); }
+  button:focus-visible { outline: 2px solid var(--fl-lime); outline-offset: 2px; border-radius: .25rem; }
+}
+.fl-swap { animation: fl-fade-in .6s ease both; }
+
+// ---------- Feature showcase ----------
+.fl-feature-tabs { display: grid; gap: .5rem; }
+.fl-feature-tab {
+  display: flex; align-items: center; gap: .85rem; width: 100%; text-align: left;
+  padding: .85rem 1rem; border-radius: 1rem; border: 1px solid transparent; background: transparent; color: var(--fl-ink);
+  transition: background-color .25s ease, border-color .25s ease;
+  .fl-icon-tile { width: 2.5rem; height: 2.5rem; font-size: 1.1rem; border-radius: .75rem; background: #E8F3D2; transition: background-color .25s ease; }
+  .fl-tab-title { font-family: 'Outfit', sans-serif; font-weight: 600; line-height: 1.2; }
+  .fl-tab-text { font-size: .85rem; color: var(--fl-muted); display: none; }
+  &:hover { background: #fff; }
+  &.active { background: #fff; border-color: var(--fl-line); box-shadow: 0 10px 30px -18px rgba($fl-deep, .35);
+    .fl-icon-tile { background: var(--fl-lime); } .fl-tab-text { display: block; } }
+  &:focus-visible { outline: 2px solid var(--fl-field); outline-offset: 2px; }
+  .fl-fr { margin-left: auto; font-size: .7rem; font-weight: 600; color: var(--fl-muted); letter-spacing: .04em; }
+}
+// Horizontal scroll strip of tabs on phones
+@include media-breakpoint-down(lg) {
+  .fl-feature-tabs { display: flex; overflow-x: auto; gap: .5rem; padding-bottom: .5rem; scroll-snap-type: x mandatory; scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; } }
+  .fl-feature-tab { flex: none; width: auto; scroll-snap-align: start; padding: .6rem .9rem; background: #fff; border-color: var(--fl-line);
+    .fl-tab-text, .fl-fr { display: none !important; } }
+}
+.fl-stage {
+  position: relative; overflow: hidden; border-radius: var(--fl-radius-xl); min-height: 460px; height: 100%;
+  background: radial-gradient(120% 90% at 100% 0%, #0E5A3F 0%, var(--fl-deep) 55%, var(--fl-deep-3) 100%);
+  padding: clamp(1.25rem, 3vw, 2.5rem); color: #fff;
+}
+.fl-stage-panel { animation: fl-up .6s cubic-bezier(.2, .7, .2, 1) both; }
+.fl-stage-panel > * { animation: fl-up .6s cubic-bezier(.2, .7, .2, 1) both; }
+@for $n from 1 through 6 { .fl-stage-panel > :nth-child(#{$n}) { animation-delay: #{$n * .07}s; } }
+.fl-mock { background: #fff; color: var(--fl-ink); border-radius: 1rem; padding: 1rem 1.1rem; box-shadow: 0 20px 50px -25px rgba(0, 0, 0, .6); }
+.fl-mock-sm { font-size: .8rem; }
+.fl-bubble { max-width: 78%; padding: .55rem .85rem; border-radius: 1rem; font-size: .85rem; line-height: 1.4;
+  &.them { background: #EEF2EA; border-bottom-left-radius: .3rem; }
+  &.me { background: var(--fl-deep); color: #fff; margin-left: auto; border-bottom-right-radius: .3rem; }
+}
+.fl-map {
+  position: relative; border-radius: 1rem; overflow: hidden; min-height: 180px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .5) 1px, transparent 1px) 0 0 / 36px 36px,
+    linear-gradient(rgba(255, 255, 255, .5) 1px, transparent 1px) 0 0 / 36px 36px,
+    linear-gradient(135deg, #DCEBC6, #C9E0A8 60%, #B9D78E);
+  .fl-pin { position: absolute; transform: translate(-50%, -100%); color: var(--fl-deep); font-size: 1.6rem; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .25)); animation: fl-pin-drop .6s cubic-bezier(.2, .7, .2, 1) both; }
+  .fl-pin.hot { color: var(--fl-ochre); }
+  .fl-river { position: absolute; inset: 0; background: linear-gradient(160deg, transparent 46%, rgba(80, 150, 200, .55) 47%, rgba(80, 150, 200, .55) 50%, transparent 51%); }
+}
+@keyframes fl-pin-drop { from { opacity: 0; transform: translate(-50%, -160%); } to { opacity: 1; transform: translate(-50%, -100%); } }
+.fl-bar-chart { display: flex; align-items: flex-end; gap: .5rem; height: 120px;
+  span { flex: 1; border-radius: .4rem .4rem 0 0; background: var(--fl-lime); transform-origin: bottom; animation: fl-grow .8s cubic-bezier(.2, .7, .2, 1) both; }
+  span:nth-child(even) { background: var(--fl-leaf); }
+}
+@keyframes fl-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.fl-typing span { display: inline-block; width: .4rem; height: .4rem; margin-right: .2rem; border-radius: 50%; background: var(--fl-muted); animation: fl-blink 1.2s infinite both;
+  &:nth-child(2) { animation-delay: .2s; } &:nth-child(3) { animation-delay: .4s; } }
+@keyframes fl-blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .fl-stage-panel, .fl-stage-panel > *, .fl-map .fl-pin, .fl-bar-chart span, .fl-typing span, .fl-swap { animation: none !important; }
+}
 
 // ---------- Motion ----------
 // Entrance on load (.fl-enter + .d1-.d5 delays), scroll reveal ([data-reveal] + .is-visible
@@ -317,3 +389,10 @@ $fl-ease: cubic-bezier(.2, .7, .2, 1);
   [data-reveal] { opacity: 1 !important; transform: none !important; }
   .fl-enter, .fl-kenburns, .fl-bob, .fl-check i { animation: none !important; }
 }
+
+// Light mock cards inside dark panels keep normal light-surface text colours
+.fl-on-dark .fl-mock .text-muted-fl { color: var(--fl-muted) !important; }
+.fl-on-dark .fl-mock .table { --bs-table-color: var(--fl-ink); --bs-table-bg: transparent; }
+.fl-feature-tab .fl-fr { white-space: nowrap; }
+.fl-stage { height: auto; }
+@include media-breakpoint-up(lg) { .fl-stage-sticky { position: sticky; top: 7.5rem; } }

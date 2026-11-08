@@ -5,3 +5,4 @@ dist
 *.log
 brand/logo-pack/*.zip
 .qodo
+brand/photos-incoming/

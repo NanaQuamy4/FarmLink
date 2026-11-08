@@ -4,8 +4,8 @@ import Brand from './Brand'
 
 const links = [
   { href: '/#how-it-works', label: 'How it works' },
+  { href: '/#features', label: 'Features' },
   { href: '/#landowners', label: 'Landowners' },
-  { href: '/#farmers', label: 'Farmers' },
   { href: '/#calculator', label: 'Harvest split' },
   { href: '/#faq', label: 'FAQ' },
 ]

@@ -1,9 +1,39 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import HarvestSplitDemo from '../components/HarvestSplitDemo'
 import CountUp from '../components/CountUp'
 import { useReveal } from '../lib/useReveal'
+import { useRotator } from '../lib/useRotator'
+import { calculateHarvestSplit } from '../lib/harvestSplit'
+import FeatureShowcase from '../components/FeatureShowcase'
+
+// Hero slides. pos / posLg keep the person clear of the headline on phones and desktops.
+// Each slide's floating cards describe an example plot and split for that crop.
+const slides = [
+  {
+    src: '/images/hero-pineapple-farm.jpg',
+    alt: 'A smiling woman in a lime shirt presenting her pineapple farm',
+    pos: '80% center', posLg: 'center center',
+    plot: { size: '3 acres', place: 'Ekumfi', detail: 'Sandy loam · Borehole' },
+    split: { crop: 'pineapples', unit: 'fruits', total: 1200, pct: 30 },
+  },
+  {
+    src: '/images/hero-vegetable-crate.jpg',
+    alt: 'A smiling farmer carrying a crate of fresh vegetables along a farm road',
+    pos: '72% 30%', posLg: 'center 30%',
+    plot: { size: '1.5 acres', place: 'Akuapem', detail: 'Clay loam · Irrigated' },
+    split: { crop: 'vegetables', unit: 'crates', total: 60, pct: 25 },
+  },
+  {
+    src: '/images/hero-farmer-maize.jpg',
+    alt: 'A smiling young farmer with a hoe showing his healthy green maize field',
+    pos: '74% 0%', posLg: 'center 0%',
+    plot: { size: '2.5 acres', place: 'Techiman', detail: 'Loamy soil · Stream nearby' },
+    split: { crop: 'maize', unit: 'bags', total: 42, pct: 30 },
+  },
+]
 
 const steps = [
   { icon: 'bi-geo-alt', title: 'List and verify', text: 'A landowner lists an idle plot with photos, size, soil and water access. A verifier checks it before farmers can see it.' },
@@ -15,9 +45,10 @@ const steps = [
 const regions = ['Ashanti', 'Bono East', 'Northern', 'Volta', 'Eastern', 'Bono', 'Upper East', 'Central']
 
 const modules = [
-  { icon: 'bi-camera-video', title: 'Education sessions', text: 'Register for expert-led video sessions and keep the notes afterwards.', img: '/images/cabbage-farm.jpg' },
+  { icon: 'bi-camera-video', title: 'Education sessions', text: 'Register for expert-led video sessions and keep the notes afterwards.', img: '/images/farmer-tablet.jpg' },
   { icon: 'bi-people', title: 'Farmer groups', text: 'Join groups by region or crop, with group chat and a notice board.', img: '/images/farmers-weeding.jpg' },
-  { icon: 'bi-basket', title: 'Produce marketplace', text: 'List your harvest, receive offers from buyers, and build your rating.', img: '/images/market-okro-seller.jpg' },
+  { icon: 'bi-basket', title: 'Produce marketplace', text: 'List your harvest and accept or decline offers from buyers.', img: '/images/market-okro-seller.jpg' },
+  { icon: 'bi-star', title: 'Ratings & profiles', text: 'Public profiles show completed seasons, sessions attended and ratings.', img: '/images/irrigating-farm.jpg' },
 ]
 
 const faqs = [
@@ -32,6 +63,14 @@ const i = (n) => ({ '--i': n })
 
 export default function Landing() {
   useReveal()
+  const [slide, goTo] = useRotator(slides.length, 7000)
+  const [heroReady, setHeroReady] = useState(false)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setHeroReady(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
+  const current = slides[slide]
+  const heroSplit = calculateHarvestSplit({ total: current.split.total, landownerPercent: current.split.pct })
 
   return (
     <>
@@ -40,7 +79,18 @@ export default function Landing() {
       {/* ---------- Hero ---------- */}
       <header className="position-relative p-2 p-md-3">
         <div className="position-relative overflow-hidden rounded-fl-xl text-white" style={{ minHeight: 'min(92vh, 860px)', isolation: 'isolate' }}>
-          <img src="/images/hero-farmer-maize.jpg" alt="A smiling young farmer with a hoe showing his healthy green maize field" className="position-absolute top-0 start-0 fl-cover fl-kenburns fl-hero-img" style={{ zIndex: -2 }} fetchpriority="high" />
+          {slides.map((sl, n) => (
+            <img
+              key={sl.src}
+              src={sl.src}
+              alt={n === slide ? sl.alt : ''}
+              aria-hidden={n !== slide}
+              className={`position-absolute top-0 start-0 fl-cover fl-hero-slide${n === slide && heroReady ? ' active' : ''}`}
+              style={{ zIndex: -2, '--pos': sl.pos, '--pos-lg': sl.posLg }}
+              fetchpriority={n === 0 ? 'high' : undefined}
+              decoding="async"
+            />
+          ))}
           <div className="position-absolute top-0 start-0 w-100 h-100 fl-hero-shade" style={{ zIndex: -1 }} />
           <div className="container position-relative" style={{ paddingTop: 'clamp(8rem, 18vh, 11rem)', paddingBottom: '9rem' }}>
             <div className="row">
@@ -60,23 +110,35 @@ export default function Landing() {
               </div>
             </div>
           </div>
-          {/* Floating cards */}
-          <div className="position-absolute bottom-0 end-0 p-3 p-md-4 d-none d-md-flex gap-3 align-items-end">
+          {/* Slide picker */}
+          <div className="position-absolute bottom-0 start-0 p-4 ps-md-5 fl-dots fl-enter d5" role="group" aria-label="Hero photos">
+            {slides.map((sl, n) => (
+              <button key={sl.src} type="button" className={n === slide ? 'active' : ''} aria-label={`Show photo ${n + 1} of ${slides.length}`} aria-pressed={n === slide} onClick={() => goTo(n)}>
+                <span />
+              </button>
+            ))}
+          </div>
+          {/* Floating cards follow the current slide */}
+          <div className="position-absolute bottom-0 end-0 p-3 p-md-4 d-none d-md-flex gap-3 align-items-end" aria-hidden="true">
             <div className="fl-enter d4">
               <div className="fl-glass fl-bob" style={{ width: 230 }}>
-                <div className="d-flex align-items-center gap-2 small mb-2"><span className="fl-status verified">Verified</span></div>
-                <div className="fw-semibold">2.5 acres · Techiman</div>
-                <div className="small" style={{ opacity: 0.8 }}>Loamy soil · Stream nearby</div>
+                <div key={slide} className="fl-swap">
+                  <div className="d-flex align-items-center gap-2 small mb-2"><span className="fl-status verified">Verified</span></div>
+                  <div className="fw-semibold">{current.plot.size} · {current.plot.place}</div>
+                  <div className="small" style={{ opacity: 0.8 }}>{current.plot.detail}</div>
+                </div>
               </div>
             </div>
             <div className="fl-enter d5">
               <div className="fl-float fl-bob alt" style={{ width: 260 }}>
-                <div className="small text-muted-fl mb-1">Harvest split · 42 bags maize</div>
-                <div className="d-flex justify-content-between fw-semibold"><span>Landowner 30%</span><span>12.6</span></div>
-                <div className="d-flex justify-content-between fw-semibold text-deep"><span>Farmer 70%</span><span>29.4</span></div>
+                <div key={slide} className="fl-swap">
+                  <div className="small text-muted-fl mb-1">Harvest split · {heroSplit.total.toLocaleString('en-GH')} {current.split.unit} {current.split.crop}</div>
+                  <div className="d-flex justify-content-between fw-semibold"><span>Landowner {heroSplit.landownerPercent}%</span><span>{heroSplit.landownerShare.toLocaleString('en-GH')}</span></div>
+                  <div className="d-flex justify-content-between fw-semibold text-deep"><span>Farmer {heroSplit.farmerPercent}%</span><span>{heroSplit.farmerShare.toLocaleString('en-GH')}</span></div>
+                </div>
                 <div className="progress mt-2" style={{ height: 6 }}>
-                  <div className="progress-bar" style={{ width: '30%', background: 'var(--fl-ochre)' }} />
-                  <div className="progress-bar bg-primary" style={{ width: '70%' }} />
+                  <div className="progress-bar" style={{ width: `${heroSplit.landownerPercent}%`, background: 'var(--fl-ochre)' }} />
+                  <div className="progress-bar bg-primary" style={{ width: `${heroSplit.farmerPercent}%` }} />
                 </div>
               </div>
             </div>
@@ -98,7 +160,7 @@ export default function Landing() {
         <p className="fl-h-section fw-medium mb-0" data-reveal style={{ fontFamily: 'Outfit', maxWidth: 1050, color: 'var(--fl-ink)', ...i(1) }}>
           Many landowners hold unused plots, and many young people want to farm but cannot get land.{' '}
           <span className="text-muted-fl">Their arrangements are usually verbal, so terms get forgotten and harvests get disputed.</span>{' '}
-          FarmLink puts the whole partnership <img src="/images/maize-field.jpg" alt="" className="d-inline-block align-middle rounded-pill object-fit-cover" style={{ width: '6rem', height: '2.6rem' }} /> on record.
+          FarmLink puts the whole partnership <img src="/images/corn-field.jpg" alt="" className="d-inline-block align-middle rounded-pill object-fit-cover" style={{ width: '6rem', height: '2.6rem' }} /> on record.
         </p>
       </section>
 
@@ -149,8 +211,11 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ---------- Features ---------- */}
+      <FeatureShowcase />
+
       {/* ---------- Audiences ---------- */}
-      <section className="fl-section container">
+      <section className="fl-section pt-0 container">
         <div className="row g-4 align-items-end mb-5">
           <div className="col-lg-6" data-reveal>
             <span className="fl-eyebrow mb-3">Who it’s for</span>
@@ -161,7 +226,7 @@ export default function Landing() {
         <div className="row g-4">
           <div className="col-md-6 col-lg-4" id="landowners" data-reveal>
             <Link to="/register?role=landowner" className="fl-img-card">
-              <img src="/images/idle-land-green.jpg" alt="Open green farmland" />
+              <img src="/images/corn-field.jpg" alt="A large green corn field" />
               <div className="fl-img-card-body">
                 <span className="fl-pill lime mb-3">Landowners</span>
                 <h3 className="h4">Put idle land to work</h3>
@@ -171,7 +236,7 @@ export default function Landing() {
           </div>
           <div className="col-md-6 col-lg-4" id="farmers" data-reveal style={i(1)}>
             <Link to="/register?role=farmer" className="fl-img-card">
-              <img src="/images/irrigating-farm.jpg" alt="A young farmer watering a field" />
+              <img src="/images/farmer-basket.jpg" alt="A smiling farmer holding a basket of freshly harvested vegetables" />
               <div className="fl-img-card-body">
                 <span className="fl-pill lime mb-3">Youth farmers & groups</span>
                 <h3 className="h4">Find land you can farm</h3>
@@ -181,7 +246,7 @@ export default function Landing() {
           </div>
           <div className="col-md-12 col-lg-4" data-reveal style={i(2)}>
             <div className="fl-img-card">
-              <img src="/images/vegetable-farm.jpg" alt="Rows of vegetables on a farm in Northern Ghana" />
+              <img src="/images/verifier-survey.jpg" alt="A woman with a clipboard checking a farm" />
               <div className="fl-img-card-body">
                 <span className="fl-pill lime mb-3">Verifiers</span>
                 <h3 className="h4">Check plots, settle disputes</h3>
@@ -253,7 +318,7 @@ export default function Landing() {
           </div>
           <div className="row g-4">
             {modules.map((m, n) => (
-              <div className="col-md-4" key={m.title} data-reveal style={i(n)}>
+              <div className="col-md-6 col-lg-3" key={m.title} data-reveal style={i(n)}>
                 <div className="fl-card-dark fl-lift fl-zoom p-0 overflow-hidden">
                   <div className="overflow-hidden"><img src={m.img} alt="" className="w-100 object-fit-cover" style={{ height: 190 }} loading="lazy" /></div>
                   <div className="p-4">
@@ -292,7 +357,7 @@ export default function Landing() {
       {/* ---------- CTA ---------- */}
       <section className="container" data-reveal="zoom">
         <div className="position-relative overflow-hidden rounded-fl-xl text-white p-4 p-md-5" style={{ isolation: 'isolate' }}>
-          <img src="/images/hero-tomato-harvest.jpg" alt="" className="position-absolute top-0 start-0 fl-cover" style={{ zIndex: -2 }} loading="lazy" />
+          <img src="/images/crop-rows-sunset.jpg" alt="" className="position-absolute top-0 start-0 fl-cover" style={{ zIndex: -2 }} loading="lazy" />
           <div className="position-absolute top-0 start-0 w-100 h-100" style={{ zIndex: -1, background: 'linear-gradient(90deg, rgba(3,43,31,.92), rgba(3,43,31,.55))' }} />
           <div className="row align-items-center g-4 py-md-4">
             <div className="col-lg-7">
