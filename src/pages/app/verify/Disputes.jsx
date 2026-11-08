@@ -112,7 +112,7 @@ export function DisputeMediation() {
           </section>
           <section className="fl-card p-0 overflow-hidden">
             <div className="p-3 border-bottom fw-semibold"><i className="bi bi-chat-dots me-1" />Chat between the parties <span className="small text-muted-fl fw-normal">· read-only</span></div>
-            <ChatThread applicationId={d.deals.application_id} canSend={false} height={360} />
+            <ChatThread applicationId={d.deals.application_id} canSend={false} height={360} showNames />
           </section>
         </div>
         <div className="col-lg-5">

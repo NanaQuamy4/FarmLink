@@ -185,7 +185,7 @@ export default function DealDetail() {
             <div className="d-flex align-items-center gap-2 p-3 border-bottom">
               <Avatar profile={other} size={36} /><div><div className="fw-semibold">{deal.isParty ? displayName(other) : `${displayName(deal.landowner)} and ${displayName(deal.farmer)}`}</div><div className="small text-muted-fl"><i className="bi bi-lock-fill me-1" />{deal.isParty ? 'Private to this deal' : 'Read-only for verifiers and admins'}</div></div>
             </div>
-            <ChatThread applicationId={deal.application_id} canSend={deal.isParty && deal.status !== 'cancelled'} />
+            <ChatThread applicationId={deal.application_id} canSend={deal.isParty && deal.status !== 'cancelled'} showNames={!deal.isParty} />
           </section>
         )}
         {tab === 'dispute' && <DisputeTab deal={deal} disputes={disputes} isParty={deal.isParty} reload={reload} />}

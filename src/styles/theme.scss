@@ -597,3 +597,28 @@ $fl-ease: cubic-bezier(.2, .7, .2, 1);
   &:hover { border-color: var(--fl-field); background-color: #EEF6E1; }
   &:focus-within { outline: 2px solid var(--fl-field); outline-offset: 2px; } }
 .fl-cover-upload-change { background: rgba(3, 43, 31, .7); color: #fff; padding: .1rem .45rem; border-radius: 50rem; }
+
+
+// ---------- Chat (WhatsApp-style) ----------
+// Bubbles in a run share a tail only on the last one; scoped to real chats (.fl-chat)
+.fl-chat .fl-bubble { max-width: 78%; padding: .45rem .75rem .35rem; border-radius: 1rem; font-size: .9rem; line-height: 1.4; position: relative; }
+.fl-chat .fl-bubble.them.last { border-bottom-left-radius: .3rem; }
+.fl-chat .fl-bubble.me.last { border-bottom-right-radius: .3rem; }
+.fl-chat .fl-bubble.them:not(.first) { border-top-left-radius: .45rem; }
+.fl-chat .fl-bubble.me:not(.first) { border-top-right-radius: .45rem; }
+.fl-chat .fl-bubble.them { background: #fff; box-shadow: 0 1px 1px rgba(0, 0, 0, .06); }
+.fl-bubble-meta { float: right; margin: .35rem 0 -.1rem .6rem; font-size: .68rem; opacity: .65; white-space: nowrap; }
+.fl-bubble .fl-read { color: var(--fl-lime); }
+.fl-chat-day, .fl-chat-unread { display: flex; justify-content: center; margin: .9rem 0 .4rem; }
+.fl-chat-day span { background: #fff; color: var(--fl-muted); font-size: .72rem; font-weight: 600; padding: .2rem .7rem; border-radius: .5rem; box-shadow: 0 1px 1px rgba(0, 0, 0, .06); }
+.fl-chat-unread { position: relative; }
+.fl-chat-unread::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid rgba($fl-ochre, .5); }
+.fl-chat-unread span { position: relative; background: #FBEBD3; color: #8A5310; font-size: .72rem; font-weight: 600; padding: .15rem .7rem; border-radius: 50rem; }
+.fl-chat-status { background: #fff; border-bottom: 1px solid var(--fl-line); color: var(--fl-muted); min-height: 1.8rem; display: flex; align-items: center; }
+.fl-online-dot { display: inline-block; width: .5rem; height: .5rem; border-radius: 50%; background: #22A04B; margin-right: .4rem; vertical-align: middle; }
+.fl-typing-text { color: var(--fl-deep); font-weight: 500; display: inline-flex; align-items: center; gap: .4rem; }
+.fl-typing { display: inline-flex; gap: .2rem; align-items: center; height: 1rem;
+  span { width: .38rem; height: .38rem; border-radius: 50%; background: var(--fl-muted); animation: fl-blink 1.2s infinite both; }
+  span:nth-child(2) { animation-delay: .2s; }
+  span:nth-child(3) { animation-delay: .4s; } }
+@media (prefers-reduced-motion: reduce) { .fl-typing span { animation: none; } }

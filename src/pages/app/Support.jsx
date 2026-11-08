@@ -6,6 +6,7 @@ import { useQuery } from '../../lib/useQuery'
 import { PageHeader, Loading, ErrorAlert, EmptyState, ActionButton, Field, Avatar } from '../../components/ui'
 import { fmtDateTime, timeAgo, displayName } from '../../lib/format'
 import { ROLE_LABELS } from '../../lib/constants'
+import { dayLabel, timeOf, sameRun, useChatPresence, typingText } from '../../lib/chat'
 
 export const CATEGORIES = {
   account: 'My account or login', plot: 'A plot listing', deal: 'A deal or agreement', verification: 'Verification',
@@ -31,6 +32,7 @@ function Thread({ ticket, staffView, onChanged }) {
   const [err, setErr] = useState('')
   const listRef = useRef(null)
   const SEL = '*, sender:profiles!support_messages_sender_id_fkey(id, full_name, is_group, group_name, avatar_url)'
+  const { online, typingNames, notifyTyping, notifyStopped } = useChatPresence(`support-${ticket.id}`, { id: profile.id, name: staffView ? 'FarmLink support' : displayName(profile) })
 
   useEffect(() => {
     let live = true
@@ -44,13 +46,14 @@ function Thread({ ticket, staffView, onChanged }) {
     return () => { live = false; supabase.removeChannel(ch) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticket.id])
-  useEffect(() => { if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight }, [msgs])
+  useEffect(() => { if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight }, [msgs, typingNames.length])
 
   async function send(e) {
     e.preventDefault()
     const body = text.trim()
     if (!body) return
     setErr('')
+    notifyStopped()
     const { data, error } = await supabase.from('support_messages').insert({ ticket_id: ticket.id, sender_id: profile.id, body }).select(SEL).single()
     if (error) return setErr(errorMessage(error))
     setText('')
@@ -60,25 +63,41 @@ function Thread({ ticket, staffView, onChanged }) {
 
   return (
     <section className="fl-card p-0 overflow-hidden h-auto">
-      <div ref={listRef} className="fl-chat p-3 d-grid gap-3 align-content-start" style={{ maxHeight: '58vh', minHeight: 260, overflowY: 'auto' }} aria-live="polite">
-        {msgs.map((m) => {
+      {(typingNames.length > 0 || online.length > 0) && (
+        <div className="fl-chat-status small px-3 py-1">
+          {typingNames.length ? <span className="fl-typing-text">{typingText(typingNames)}<span className="fl-typing"><span /><span /><span /></span></span>
+            : <span><span className="fl-online-dot" />{staffView ? 'The user is online' : 'Support is online'}</span>}
+        </div>
+      )}
+      <div ref={listRef} className="fl-chat px-3 py-2" style={{ maxHeight: '58vh', minHeight: 260, overflowY: 'auto' }} aria-live="polite">
+        {msgs.map((m, i) => {
           const mine = m.sender_id === profile.id
+          const prev = msgs[i - 1]
+          const next = msgs[i + 1]
+          const newDay = !prev || dayLabel(prev.created_at) !== dayLabel(m.created_at)
+          const startsRun = newDay || !sameRun(prev, m)
+          const endsRun = !next || !sameRun(m, next) || dayLabel(next.created_at) !== dayLabel(m.created_at)
           return (
-            <div key={m.id} className={`d-flex gap-2 align-items-end ${mine ? 'flex-row-reverse' : ''}`}>
-              {!mine && (m.is_staff ? <span className="fl-icon-tile flex-none" style={{ width: 30, height: 30, fontSize: '.9rem' }}><i className="bi bi-headset" /></span> : <Avatar profile={m.sender} size={30} />)}
-              <div className={`fl-bubble ${mine ? 'me' : 'them'}`} style={{ maxWidth: '82%' }}>
-                <strong className="d-block small">{m.is_staff ? `FarmLink support${staffView ? ` · ${m.sender?.full_name}` : ''}` : displayName(m.sender)}</strong>
-                <span style={{ whiteSpace: 'pre-wrap' }}>{m.body}</span>
-                <span className="d-block text-end" style={{ fontSize: '.68rem', opacity: 0.65 }}>{fmtDateTime(m.created_at)}</span>
+            <div key={m.id}>
+              {newDay && <div className="fl-chat-day"><span>{dayLabel(m.created_at)}</span></div>}
+              <div className={`d-flex gap-2 align-items-end ${mine ? 'flex-row-reverse' : ''} ${startsRun ? 'mt-2' : 'mt-1'}`}>
+                {!mine && (endsRun ? (m.is_staff ? <span className="fl-icon-tile flex-none" style={{ width: 28, height: 28, fontSize: '.85rem' }}><i className="bi bi-headset" /></span> : <Avatar profile={m.sender} size={28} />) : <span className="flex-none" style={{ width: 28 }} />)}
+                <div className={`fl-bubble ${mine ? 'me' : 'them'} ${startsRun ? 'first' : ''} ${endsRun ? 'last' : ''}`} style={{ maxWidth: '82%' }}>
+                  {startsRun && <strong className="d-block small">{m.is_staff ? `FarmLink support${staffView ? ` · ${m.sender?.full_name}` : ''}` : displayName(m.sender)}</strong>}
+                  <span style={{ whiteSpace: 'pre-wrap' }}>{m.body}</span>
+                  <span className="fl-bubble-meta" title={fmtDateTime(m.created_at)}>{timeOf(m.created_at)}</span>
+                </div>
               </div>
             </div>
           )
         })}
+        {typingNames.length > 0 && <div className="d-flex mt-2"><div className="fl-bubble them first last"><span className="fl-typing"><span /><span /><span /></span></div></div>}
       </div>
       {err && <div className="alert alert-danger py-1 px-2 small m-2 mb-0">{err}</div>}
       <form onSubmit={send} className="d-flex gap-2 p-2 border-top bg-white">
         <label htmlFor="support-reply" className="visually-hidden">Reply</label>
-        <textarea id="support-reply" className="form-control" rows={2} maxLength={4000} value={text} onChange={(e) => setText(e.target.value)}
+        <textarea id="support-reply" className="form-control" rows={2} maxLength={4000} value={text} onBlur={notifyStopped}
+          onChange={(e) => { setText(e.target.value); if (e.target.value) notifyTyping(); else notifyStopped() }}
           placeholder={staffView ? 'Reply to the user…' : ticket.status === 'closed' ? 'Write to reopen this request…' : 'Add more details…'} />
         <button className="btn btn-primary flex-none" disabled={!text.trim()}>{staffView ? 'Reply' : 'Send'}</button>
       </form>
