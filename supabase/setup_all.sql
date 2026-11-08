@@ -1592,14 +1592,14 @@ begin
           now() - interval '20 days', 60, 100, 'https://www.fao.org/3/x5036e/x5036e00.htm', 'https://www.youtube.com/results?search_query=maize+post+harvest+storage')
   returning id into s_past;
   insert into sessions (host_id, title, description, topic, region, starts_at, duration_minutes, capacity) values
-    (u_officer, 'Controlling fall armyworm in maize', 'Spotting early damage and safe control options.', 'Maize', 'Bono East', date_trunc('hour', now()) + interval '3 days 10 hours', 60, 60)
+    (u_officer, 'Controlling fall armyworm in maize', 'Spotting early damage and safe control options.', 'Maize', 'Bono East', date_trunc('day', now()) + interval '3 days 10 hours', 60, 60)
   returning id into s1;
   perform set_config('request.jwt.claims', json_build_object('sub', u_comm, 'role', 'authenticated')::text, true);
   insert into sessions (host_id, title, description, topic, region, starts_at, duration_minutes, capacity) values
-    (u_comm, 'Dry-season vegetables with drip irrigation', 'Setting up a low-cost drip line.', 'Vegetables', 'Volta', date_trunc('hour', now()) + interval '7 days 16 hours', 75, 40)
+    (u_comm, 'Dry-season vegetables with drip irrigation', 'Setting up a low-cost drip line.', 'Vegetables', 'Volta', date_trunc('day', now()) + interval '7 days 16 hours', 75, 40)
   returning id into s2;
   insert into sessions (host_id, title, description, topic, region, starts_at, duration_minutes, capacity) values
-    (u_comm, 'Reading your soil before you plant', 'Simple field tests and when to get a lab test.', 'Soil', null, date_trunc('hour', now()) + interval '12 days 11 hours', 60, 80)
+    (u_comm, 'Reading your soil before you plant', 'Simple field tests and when to get a lab test.', 'Soil', null, date_trunc('day', now()) + interval '12 days 11 hours', 60, 80)
   returning id into s3;
   -- registrations (past one attended)
   insert into session_registrations (session_id, user_id, registered_at, attended_at) values

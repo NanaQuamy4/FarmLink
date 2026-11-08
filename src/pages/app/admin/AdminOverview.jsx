@@ -16,7 +16,7 @@ export function BarList({ data, labels = {} }) {
     <div className="d-grid gap-2">
       {entries.map(([k, v], i) => (
         <div key={k}>
-          <div className="d-flex justify-content-between small"><span>{labels[k]?.[0] || labels[k] || k}</span><span className="fw-semibold">{v}</span></div>
+          <div className="d-flex justify-content-between small"><span>{(Array.isArray(labels[k]) ? labels[k][0] : labels[k]) || k}</span><span className="fw-semibold">{v}</span></div>
           <div className="progress" style={{ height: 8 }}><div className="progress-bar fl-grow-x" style={{ width: `${(v / max) * 100}%`, background: i % 2 ? 'var(--fl-leaf)' : 'var(--fl-deep)', animationDelay: `${i * 0.06}s` }} /></div>
         </div>
       ))}
