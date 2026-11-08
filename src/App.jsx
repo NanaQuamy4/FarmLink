@@ -23,6 +23,8 @@ import ApplicationDetail from './pages/app/deals/ApplicationDetail'
 import Messages from './pages/app/deals/Messages'
 import Deals from './pages/app/deals/Deals'
 import DealDetail from './pages/app/deals/DealDetail'
+import { DisputeList, DisputeMediation } from './pages/app/verify/Disputes'
+import { AdminUsers, AdminVerifiers, AdminPlots, AdminReports } from './pages/app/admin/Admin'
 
 function NotFound() {
   return (
@@ -83,15 +85,15 @@ export default function App() {
         {/* Verifier */}
         <Route path="/verify" element={<RequireRole roles={V}><VerifyQueue /></RequireRole>} />
         <Route path="/verify/plots/:id" element={<RequireRole roles={V}><VerifyPlot /></RequireRole>} />
-        <Route path="/verify/disputes" element={<RequireRole roles={V}><Soon title="Disputes" /></RequireRole>} />
-        <Route path="/verify/disputes/:id" element={<RequireRole roles={V}><Soon title="Dispute" /></RequireRole>} />
+        <Route path="/verify/disputes" element={<RequireRole roles={V}><DisputeList /></RequireRole>} />
+        <Route path="/verify/disputes/:id" element={<RequireRole roles={V}><DisputeMediation /></RequireRole>} />
 
         {/* Admin */}
-        <Route path="/admin/users" element={<RequireRole roles={A}><Soon title="Users" /></RequireRole>} />
-        <Route path="/admin/verifiers" element={<RequireRole roles={A}><Soon title="Verifiers" /></RequireRole>} />
-        <Route path="/admin/plots" element={<RequireRole roles={A}><Soon title="Plots" /></RequireRole>} />
-        <Route path="/admin/disputes" element={<RequireRole roles={A}><Soon title="Disputes" /></RequireRole>} />
-        <Route path="/admin/reports" element={<RequireRole roles={A}><Soon title="Reports" /></RequireRole>} />
+        <Route path="/admin/users" element={<RequireRole roles={A}><AdminUsers /></RequireRole>} />
+        <Route path="/admin/verifiers" element={<RequireRole roles={A}><AdminVerifiers /></RequireRole>} />
+        <Route path="/admin/plots" element={<RequireRole roles={A}><AdminPlots /></RequireRole>} />
+        <Route path="/admin/disputes" element={<RequireRole roles={A}><DisputeList /></RequireRole>} />
+        <Route path="/admin/reports" element={<RequireRole roles={A}><AdminReports /></RequireRole>} />
 
         {/* Extended */}
         <Route path="/groups" element={<Soon title="Groups" />} />
