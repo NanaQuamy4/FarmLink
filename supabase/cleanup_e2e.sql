@@ -17,5 +17,9 @@ begin
     delete from plots where id = p;                      -- photos and verifications cascade
   end if;
   delete from messages where body in ('Automated check message', 'Realtime check, please ignore');
+  delete from notifications where link in (select '/help/' || id from support_tickets where subject = 'E2E support check')
+                               or link in (select '/admin/support/' || id from support_tickets where subject = 'E2E support check');
+  delete from support_tickets where subject = 'E2E support check';     -- its messages cascade
+  delete from session_questions where body like 'E2E check:%';
   delete from offers where message is null and quantity = 1 and price_per_unit = 10 and status = 'withdrawn';
 end $$;
