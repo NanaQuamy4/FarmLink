@@ -72,7 +72,7 @@ export function SessionList() {
 
   return (
     <div className="fl-page">
-      <PageHeader eyebrow="Learn" title="Education sessions" text="Live video sessions with extension officers and experts. Join from any phone browser."
+      <PageHeader image="/images/farmer-tablet.jpg" eyebrow="Education sessions" title="Learn from experts," accent="wherever you farm." text="Live video sessions with extension officers and experts. Join from any phone browser."
         actions={canHost && <button type="button" className="btn btn-primary" onClick={() => setCreating(!creating)}><i className="bi bi-plus-lg me-1" />Schedule a session</button>} />
       {creating && <SessionForm profile={profile} onDone={() => { setCreating(false); reload() }} />}
       <div className="d-flex gap-2 mb-4">

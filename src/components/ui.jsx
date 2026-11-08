@@ -38,7 +38,42 @@ export function EmptyState({ icon = 'bi-inbox', title, text, action }) {
   )
 }
 
-export function PageHeader({ eyebrow, title, text, actions }) {
+// Page title. With `image` it becomes a photo hero (rounded photo, green gradient, frosted stat
+// cards) in the style of the landing page; `accent` is shown in the italic serif after the title.
+export function PageHeader({ eyebrow, title, accent, text, actions, image, imagePosition, photo, tall, stats, children }) {
+  if (image || photo) {
+    return (
+      <header className={`fl-page-hero fl-on-dark${tall ? ' tall' : ''}`}>
+        {photo ? <Photo path={photo.path} bucket={photo.bucket} alt="" /> : <img src={image} alt="" style={imagePosition ? { objectPosition: imagePosition } : undefined} />}
+        <div className="fl-page-hero-body">
+          <div className="d-flex flex-wrap align-items-end justify-content-between gap-3">
+            <div style={{ maxWidth: 720 }}>
+              {eyebrow && <span className="fl-pill dark mb-3 fl-enter">{eyebrow}</span>}
+              <h1 className="mb-2 fl-enter d1">{title}{accent && <> <span className="fl-serif text-lime">{accent}</span></>}</h1>
+              {text && <p className="mb-0 fl-enter d2" style={{ opacity: 0.85, maxWidth: 560 }}>{text}</p>}
+            </div>
+            {actions && <div className="d-flex flex-wrap gap-2 fl-enter d3">{actions}</div>}
+          </div>
+          {stats && (
+            <div className="fl-hero-stats fl-enter d3">
+              {stats.map((s) => {
+                const body = (
+                  <>
+                    <span className="d-flex align-items-center gap-2 small" style={{ opacity: 0.85 }}><i className={`bi ${s.icon}`} />{s.label}</span>
+                    <span className="fl-hero-stat-value">{s.value}</span>
+                  </>
+                )
+                return s.to
+                  ? <Link key={s.label} to={s.to} className={`fl-hero-stat${s.highlight ? ' lime' : ''}`}>{body}</Link>
+                  : <div key={s.label} className={`fl-hero-stat${s.highlight ? ' lime' : ''}`}>{body}</div>
+              })}
+            </div>
+          )}
+          {children}
+        </div>
+      </header>
+    )
+  }
   return (
     <div className="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
       <div>

@@ -17,8 +17,8 @@ export default function MyPlots() {
 
   return (
     <div className="fl-page">
-      <PageHeader eyebrow="Landowner" title="My plots" text="Plots are checked by a verifier before farmers can see them."
-        actions={<Link to="/plots/new" className="btn btn-primary"><i className="bi bi-plus-lg me-1" />List a plot</Link>} />
+      <PageHeader image="/images/corn-field.jpg" eyebrow="My plots" title="Your land," accent="on record." text="Plots are checked by a verifier before farmers can see them."
+        actions={<Link to="/plots/new" className="btn btn-primary btn-lg"><i className="bi bi-plus-lg me-1" />List a plot</Link>} />
       <ErrorAlert error={error} onRetry={reload} />
       <div className="d-flex flex-wrap gap-2 mb-4" role="tablist">
         {['all', 'pending', 'verified', 'in_deal', 'rejected', 'archived'].map((k) => (

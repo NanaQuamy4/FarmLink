@@ -26,7 +26,7 @@ export default function Applications() {
 
   return (
     <div className="fl-page">
-      <PageHeader eyebrow={role === 'farmer' ? 'Farmer' : 'Landowner'} title={role === 'farmer' ? 'My applications' : 'Applications'}
+      <PageHeader image={role === 'admin' ? undefined : '/images/farmer-basket.jpg'} eyebrow={role === 'farmer' ? 'My applications' : 'Applications'} title={role === 'farmer' ? 'Your applications' : 'Who wants to farm'} accent={role === 'farmer' ? 'in one place.' : 'your land.'}
         text={role === 'farmer' ? 'Plots you have applied for.' : 'Compare applicants, chat with them, then accept one to open a deal.'}
         actions={role === 'farmer' && <Link to="/find" className="btn btn-primary"><i className="bi bi-search me-1" />Find land</Link>} />
       <div className="d-flex flex-wrap gap-2 mb-4">

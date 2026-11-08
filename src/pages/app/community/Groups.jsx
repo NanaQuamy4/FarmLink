@@ -48,7 +48,7 @@ export function GroupList() {
 
   return (
     <div className="fl-page">
-      <PageHeader eyebrow="Community" title="Farmer groups" text="Organise labour days, buy inputs together and share what works."
+      <PageHeader image="/images/farmers-weeding.jpg" eyebrow="Farmer groups" title="Farm together," accent="like nnoboa." text="Organise labour days, buy inputs together and share what works."
         actions={<button type="button" className="btn btn-primary" onClick={() => setCreating(!creating)}><i className="bi bi-plus-lg me-1" />Start a group</button>} />
       <ErrorAlert error={err || error} onRetry={error ? reload : undefined} />
       {creating && (

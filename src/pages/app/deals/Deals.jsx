@@ -3,7 +3,7 @@ import { supabase } from '../../../lib/supabase'
 import { useAuth } from '../../../lib/auth'
 import { useQuery } from '../../../lib/useQuery'
 import { PageHeader, Loading, ErrorAlert, EmptyState } from '../../../components/ui'
-import { DealRow, DEAL_SELECT } from '../../../components/cards'
+import { DealRow, DealCard, DEAL_SELECT } from '../../../components/cards'
 
 const GROUPS = { running: ['drafting', 'active', 'harvested'], completed: ['completed'], cancelled: ['cancelled'] }
 
@@ -16,7 +16,7 @@ export default function Deals() {
 
   return (
     <div className="fl-page">
-      <PageHeader title={role === 'verifier' ? 'Assigned deals' : 'Deals'}
+      <PageHeader image={['landowner', 'farmer'].includes(role) ? '/images/crop-rows-sunset.jpg' : undefined} eyebrow={['landowner', 'farmer'].includes(role) ? 'Deals' : undefined} title={role === 'verifier' ? 'Assigned deals' : ['landowner', 'farmer'].includes(role) ? 'Every season,' : 'Deals'} accent={['landowner', 'farmer'].includes(role) ? 'agreed and recorded.' : undefined}
         text={role === 'verifier' ? 'Deals on plots you verified. You can read them to mediate disputes.' : role === 'admin' ? 'All deals on the platform.' : 'Each deal records the agreement, season and harvest split.'} />
       <div className="d-flex gap-2 mb-4">
         {Object.keys(GROUPS).map((k) => (
@@ -29,7 +29,9 @@ export default function Deals() {
       {loading ? <Loading /> : rows.length === 0 ? (
         <div className="fl-card"><EmptyState icon="bi-file-earmark-check" title="No deals here" text={role === 'farmer' ? 'Apply for a plot. When a landowner accepts, the deal appears here.' : 'Accept an application to start a deal.'} /></div>
       ) : (
-        <div className="fl-card p-2">{rows.map((d) => <DealRow key={d.id} deal={d} me={profile.id} />)}</div>
+        ['landowner', 'farmer'].includes(role)
+          ? <div className="row g-3">{rows.map((d) => <div className="col-sm-6 col-xl-4" key={d.id}><DealCard deal={d} me={profile.id} /></div>)}</div>
+          : <div className="fl-card p-2">{rows.map((d) => <DealRow key={d.id} deal={d} me={profile.id} />)}</div>
       )}
     </div>
   )

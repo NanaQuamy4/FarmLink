@@ -60,7 +60,7 @@ export function Marketplace() {
 
   return (
     <div className="fl-page">
-      <PageHeader eyebrow="Marketplace" title={canSell ? 'Sell your produce' : 'Fresh produce'} text="Buyers send offers. Sellers accept or decline. Payment happens outside FarmLink."
+      <PageHeader image="/images/hero-tomato-harvest.jpg" eyebrow="Marketplace" title={canSell ? 'Sell your harvest,' : 'Fresh produce,'} accent={canSell ? 'build your name.' : 'straight from farmers.'} text="Buyers send offers. Sellers accept or decline. Payment happens outside FarmLink."
         actions={canSell && <button type="button" className="btn btn-primary" onClick={() => setCreating(!creating)}><i className="bi bi-plus-lg me-1" />List produce</button>} />
       {creating && <ListingForm profile={profile} onDone={() => { setCreating(false); setMine(true); reload() }} />}
       <div className="d-flex flex-wrap gap-2 align-items-center mb-4">
@@ -75,15 +75,15 @@ export function Marketplace() {
         <div className="row g-3">
           {rows.map((l) => (
             <div className="col-sm-6 col-xl-4" key={l.id}>
-              <Link to={`/market/listings/${l.id}`} className="fl-plot-card">
-                <div className="overflow-hidden position-relative">
-                  <Photo path={l.photo_path} bucket="produce-photos" className="fl-plot-img" style={{ height: 170 }} />
-                  {l.status !== 'open' && <span className="position-absolute top-0 start-0 m-2 fl-status neutral">{l.status === 'sold' ? 'Sold' : 'Closed'}</span>}
-                </div>
-                <div className="p-3">
-                  <div className="d-flex justify-content-between"><span className="fw-semibold">{l.crop}</span><span className="fw-semibold text-deep">{l.price_per_unit != null ? `${fmtCedis(l.price_per_unit)}/${l.unit.replace(/s$/, '')}` : 'Open to offers'}</span></div>
-                  <div className="small text-muted-fl">{fmtNumber(l.quantity)} {l.unit} · {l.region}</div>
-                  <div className="small text-muted-fl">{displayName(l.seller)} · {timeAgo(l.created_at)}</div>
+              <Link to={`/market/listings/${l.id}`} className="fl-img-card fl-photo-card">
+                <Photo path={l.photo_path} bucket="produce-photos" className="fl-photo-fill" />
+                {l.status !== 'open' && <span className="position-absolute top-0 start-0 m-3 fl-status neutral">{l.status === 'sold' ? 'Sold' : 'Closed'}</span>}
+                <span className="fl-card-arrow" aria-hidden="true"><i className="bi bi-arrow-up-right" /></span>
+                <div className="fl-img-card-body pe-5">
+                  <span className="fl-pill lime mb-2">{l.price_per_unit != null ? `${fmtCedis(l.price_per_unit)} / ${l.unit.replace(/s$/, '')}` : 'Open to offers'}</span>
+                  <h3 className="h5 mb-1">{l.crop}</h3>
+                  <div className="small" style={{ opacity: 0.85 }}>{fmtNumber(l.quantity)} {l.unit} · {l.region}</div>
+                  <div className="small" style={{ opacity: 0.85 }}>{displayName(l.seller)} · {timeAgo(l.created_at)}</div>
                 </div>
               </Link>
             </div>
@@ -203,7 +203,7 @@ export function MyOffers() {
   }
   return (
     <div className="fl-page">
-      <PageHeader eyebrow="Buyer" title="My offers" actions={<Link to="/market" className="btn btn-primary">Browse produce</Link>} />
+      <PageHeader image="/images/market-tomatoes.jpg" eyebrow="My offers" title="Your offers," accent="at a glance." actions={<Link to="/market" className="btn btn-primary">Browse produce</Link>} />
       <ErrorAlert error={error} onRetry={reload} />
       {loading ? <Loading /> : !data?.length ? <div className="fl-card"><EmptyState icon="bi-tags" title="No offers yet" /></div> : (
         <div className="fl-card p-2">

@@ -8,6 +8,9 @@ import { useAuth } from '../lib/auth'
 import { ROLE_LABELS } from '../lib/constants'
 import { displayName } from '../lib/format'
 
+// Bottom-bar label: "My plots" → "Plots"
+const shortLabel = (l) => { const s = l.replace(/^My /, ''); return s[0].toUpperCase() + s.slice(1) }
+
 function NavList({ items, onNavigate }) {
   let lastSection
   return (
@@ -105,7 +108,7 @@ export default function AppLayout() {
       <nav className="fl-bottombar d-lg-none" aria-label="Quick">
         {mobileItems.map((it) => (
           <NavLink key={it.to} to={it.to} end={it.to === '/dashboard'} className="fl-bottom-link">
-            <i className={`bi ${it.icon}`} /><span>{it.label.replace('My ', '')}</span>
+            <i className={`bi ${it.icon}`} /><span>{shortLabel(it.label)}</span>
           </NavLink>
         ))}
         <button type="button" className="fl-bottom-link border-0 bg-transparent" onClick={() => setDrawer(true)}>

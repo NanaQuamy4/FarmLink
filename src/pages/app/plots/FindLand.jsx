@@ -50,7 +50,7 @@ export default function FindLand() {
 
   return (
     <div className="fl-page">
-      <PageHeader eyebrow="Farmer" title="Find land" text="Every plot here has been checked by a verifier." />
+      <PageHeader image="/images/open-farmland-sky.jpg" eyebrow="Find land" title="Verified land," accent="ready to farm." text="Every plot here has been checked by a verifier. Filter by region, size, soil, water and crop." />
 
       <div className="fl-card p-3 mb-4">
         <div className="row g-2 align-items-end">

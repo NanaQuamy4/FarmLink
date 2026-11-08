@@ -493,3 +493,79 @@ $fl-ease: cubic-bezier(.2, .7, .2, 1);
 // Role picker on the register page
 .fl-role-option { border-radius: 1rem !important; }
 .fl-role-title { font-size: clamp(.78rem, 3.4vw, 1rem); overflow-wrap: anywhere; }
+
+// ---------- User layout (landowners, farmers, buyers) ----------
+.fl-user-app { min-height: 100vh; background: var(--fl-ground); }
+.fl-user-top { position: sticky; top: 0; z-index: 1030; padding: .75rem clamp(.5rem, 2vw, 1.25rem) .5rem; }
+.fl-user-top-inner {
+  display: flex; align-items: center; gap: .75rem; max-width: 1360px; margin: 0 auto;
+  background: rgba(255, 255, 255, .86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--fl-line); border-radius: 1.4rem; padding: .45rem .5rem .45rem 1rem;
+  box-shadow: 0 14px 40px -26px rgba($fl-deep, .45);
+}
+.fl-user-nav {
+  display: flex; align-items: center; gap: .15rem; background: var(--fl-deep); border-radius: 50rem; padding: .3rem;
+  a { display: inline-flex; align-items: center; gap: .4rem; padding: .45rem .85rem; border-radius: 50rem; white-space: nowrap;
+      color: rgba(255, 255, 255, .8); text-decoration: none; font-weight: 500; font-size: .9rem; transition: background-color .2s ease, color .2s ease;
+      &:hover { color: #fff; background: rgba(255, 255, 255, .08); }
+      &.active { background: var(--fl-lime); color: var(--fl-deep); } }
+}
+.fl-user-nav-sep { width: 1px; height: 1.4rem; background: rgba(255, 255, 255, .2); margin: 0 .2rem; }
+@media (max-width: 1399.98px) { .fl-user-nav a.c span { display: none; } .fl-user-nav a.c { padding-inline: .65rem; } }
+.fl-user-main { max-width: 1360px; margin: 0 auto; padding: .5rem clamp(.75rem, 2vw, 1.25rem) 6.5rem; }
+@include media-breakpoint-up(lg) { .fl-user-main { padding-bottom: 3rem; } }
+
+// ---------- Photo page hero ----------
+.fl-page-hero {
+  position: relative; overflow: hidden; isolation: isolate; border-radius: var(--fl-radius-xl); color: #fff;
+  min-height: 240px; display: flex; flex-direction: column; justify-content: flex-end; margin-bottom: 1.75rem;
+  > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; animation: fl-kenburns 2.6s cubic-bezier(.2, .7, .2, 1) both; }
+  &::before { content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(95deg, rgba(3, 43, 31, .9) 0%, rgba(3, 43, 31, .62) 45%, rgba(3, 43, 31, .18) 100%),
+                linear-gradient(0deg, rgba(3, 43, 31, .55), rgba(3, 43, 31, 0) 55%); }
+  &.tall { min-height: clamp(380px, 54vh, 500px); }
+  h1 { color: #fff; font-size: clamp(1.9rem, 4.4vw, 3.2rem); line-height: 1.05; letter-spacing: -.03em; }
+  .btn-primary { --bs-btn-bg: #{$fl-lime}; --bs-btn-border-color: #{$fl-lime}; --bs-btn-color: #{$fl-deep};
+    --bs-btn-hover-bg: #{$fl-lime-2}; --bs-btn-hover-border-color: #{$fl-lime-2}; --bs-btn-hover-color: #{$fl-deep};
+    --bs-btn-active-bg: #{$fl-lime-2}; --bs-btn-active-color: #{$fl-deep}; }
+  .btn-outline-primary { --bs-btn-color: #fff; --bs-btn-border-color: rgba(255, 255, 255, .5); --bs-btn-hover-bg: #fff; --bs-btn-hover-color: #{$fl-deep}; --bs-btn-hover-border-color: #fff; }
+}
+.fl-page-hero-body { padding: clamp(1.25rem, 3.5vw, 2.75rem); }
+.fl-hero-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .75rem; margin-top: 1.5rem; max-width: 860px; }
+.fl-hero-stat {
+  display: grid; gap: .35rem; padding: .9rem 1.1rem; border-radius: 1.1rem; color: #fff; text-decoration: none;
+  background: rgba(3, 43, 31, .45); border: 1px solid rgba(255, 255, 255, .22); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  transition: transform .3s cubic-bezier(.2, .7, .2, 1), background-color .3s ease;
+  &:hover { color: #fff; transform: translateY(-3px); background: rgba(3, 43, 31, .62); }
+  &.lime { background: var(--fl-lime); border-color: var(--fl-lime); color: var(--fl-deep); &:hover { color: var(--fl-deep); background: $fl-lime-2; } }
+}
+.fl-hero-stat-value { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 1.9rem; line-height: 1; letter-spacing: -.02em; }
+
+// ---------- Photo cards ----------
+.fl-photo-card { min-height: 300px; }
+.fl-photo-fill { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform .6s ease; background: #DDE5D5; }
+.fl-photo-card:hover .fl-photo-fill { transform: scale(1.05); }
+.fl-card-arrow {
+  position: absolute; right: 1rem; bottom: 1rem; width: 2.6rem; height: 2.6rem; border-radius: 50%; display: grid; place-items: center;
+  background: var(--fl-lime); color: var(--fl-deep); font-size: 1.05rem; transition: transform .35s cubic-bezier(.2, .7, .2, 1); z-index: 1;
+}
+.fl-img-card:hover .fl-card-arrow { transform: rotate(45deg); }
+.fl-pill.glass { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .28); color: #fff; font-size: .72rem; padding: .15rem .6rem; backdrop-filter: blur(8px); }
+
+.fl-deal-card { display: flex; flex-direction: column; height: 100%; background: #fff; border: 1px solid var(--fl-line); border-radius: var(--fl-radius); overflow: hidden; color: inherit; text-decoration: none;
+  &:hover { color: inherit; } }
+.fl-deal-card-img { position: relative; height: 140px; overflow: hidden; img { transition: transform .6s ease; } }
+.fl-deal-card:hover .fl-deal-card-img img { transform: scale(1.05); }
+.fl-step-dot { width: 2rem; height: 2rem; margin: 0 auto; border-radius: 50%; display: grid; place-items: center; font-size: .85rem; background: var(--fl-ground); color: var(--fl-muted); border: 1px solid var(--fl-line);
+  &.done { background: var(--fl-lime); color: var(--fl-deep); border-color: var(--fl-lime); } }
+.fl-on-dark .fl-step-dot:not(.done) { background: rgba(255, 255, 255, .08); color: rgba(255, 255, 255, .6); border-color: rgba(255, 255, 255, .15); }
+
+// Dark band inside the app
+.fl-band { background: var(--fl-deep); color: rgba(255, 255, 255, .8); border-radius: var(--fl-radius-xl); padding: clamp(1.25rem, 3vw, 2.25rem);
+  h2, h3 { color: #fff; } }
+.fl-band .fl-card-dark { transition: border-color .3s ease, transform .3s ease; }
+.fl-band a.fl-card-dark { color: inherit; text-decoration: none; &:hover { border-color: rgba($fl-lime, .45); transform: translateY(-2px); } }
+.fl-add-card { display: grid; place-items: center; min-height: 300px; border: 2px dashed rgba($fl-field, .45); border-radius: var(--fl-radius-xl); color: var(--fl-deep); text-decoration: none; background: #F7FAF1; font-weight: 600;
+  transition: background-color .2s ease, border-color .2s ease; &:hover { background: #EEF6E1; border-color: var(--fl-field); color: var(--fl-deep); } }
+.fl-section-title { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin: 2.25rem 0 1rem;
+  h2 { font-size: clamp(1.35rem, 2.4vw, 1.75rem); margin: 0; } }

@@ -7,6 +7,8 @@ import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import { ForgotPassword, ResetPassword } from './pages/auth/PasswordReset'
 import AppLayout from './app/AppLayout'
+import UserLayout from './app/UserLayout'
+import { useAuth } from './lib/auth'
 import { RequireAuth, RequireRole, GuestOnly } from './app/guards'
 import Dashboard from './pages/app/Dashboard'
 import Notifications from './pages/app/Notifications'
@@ -42,6 +44,13 @@ function NotFound() {
   )
 }
 
+// Admins and verifiers work in the sidebar dashboard; landowners, farmers and buyers get the
+// site-style layout with a top pill menu.
+function RoleLayout() {
+  const { role } = useAuth()
+  return role === 'admin' || role === 'verifier' ? <AppLayout /> : <UserLayout />
+}
+
 const L = ['landowner', 'admin']
 const F = ['farmer', 'admin']
 const V = ['verifier', 'admin']
@@ -58,7 +67,7 @@ export default function App() {
       <Route path="/forgot-password" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
-      <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
+      <Route element={<RequireAuth><RoleLayout /></RequireAuth>}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/profile" element={<Profile />} />

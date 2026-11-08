@@ -3,7 +3,8 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { supabase, errorMessage } from '../../../lib/supabase'
 import { useAuth } from '../../../lib/auth'
 import { useQuery } from '../../../lib/useQuery'
-import { Loading, ErrorAlert, StatusBadge, Avatar, ActionButton, Field } from '../../../components/ui'
+import { Loading, ErrorAlert, StatusBadge, Avatar, ActionButton, Field, PageHeader } from '../../../components/ui'
+import { coverPhoto } from '../../../components/cards'
 import ChatThread from '../../../components/ChatThread'
 import AgreementTab from './AgreementTab'
 import SeasonTab from './SeasonTab'
@@ -116,17 +117,14 @@ export default function DealDetail() {
   return (
     <div className="fl-page">
       <Link to="/deals" className="small d-inline-block mb-3 d-print-none"><i className="bi bi-arrow-left me-1" />Deals</Link>
-      <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
-        <div>
-          <div className="small text-muted-fl">Deal for</div>
-          <h1 className="h2 mb-1">{deal.plots.title}</h1>
-          <div className="text-muted-fl small">{fmtNumber(deal.plots.size_acres)} acres · {[deal.plots.district, deal.plots.region].filter(Boolean).join(', ')}</div>
-        </div>
-        <div className="d-flex gap-2 align-items-center">
-          {openDisputes > 0 && <span className="fl-status rejected">Dispute open</span>}
-          <StatusBadge map={DEAL_STATUS} value={deal.status} />
-        </div>
-      </div>
+      <PageHeader photo={{ path: coverPhoto(deal.plots), bucket: 'plot-photos' }} eyebrow={`Deal · ${DEAL_STATUS[deal.status][0]}`} title={deal.plots.title}
+        text={`${fmtNumber(deal.plots.size_acres)} acres · ${[deal.plots.district, deal.plots.region].filter(Boolean).join(', ')} · ${displayName(deal.landowner)} and ${displayName(deal.farmer)}`}
+        actions={openDisputes > 0 && <span className="fl-status rejected">Dispute open</span>}
+        stats={[
+          { icon: 'bi-flower1', label: 'Crop', value: current?.crop || deal.applications?.planned_crop || '–' },
+          { icon: 'bi-pie-chart', label: 'Split', value: current ? `${fmtNumber(current.landowner_percent)}/${fmtNumber(100 - current.landowner_percent)}` : '–' },
+          { icon: 'bi-flag', label: 'Milestones', value: `${deal.milestoneCount}/4`, highlight: deal.status === 'active' },
+        ]} />
       <ErrorAlert error={err} />
 
       <div className="fl-tabs d-print-none mb-4" role="tablist">
