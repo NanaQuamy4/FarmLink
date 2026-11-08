@@ -12,6 +12,17 @@ import Dashboard from './pages/app/Dashboard'
 import Notifications from './pages/app/Notifications'
 import Profile from './pages/app/Profile'
 import { EmptyState } from './components/ui'
+import MyPlots from './pages/app/plots/MyPlots'
+import PlotForm from './pages/app/plots/PlotForm'
+import PlotDetail from './pages/app/plots/PlotDetail'
+import FindLand from './pages/app/plots/FindLand'
+import VerifyQueue from './pages/app/verify/VerifyQueue'
+import VerifyPlot from './pages/app/verify/VerifyPlot'
+import Applications from './pages/app/deals/Applications'
+import ApplicationDetail from './pages/app/deals/ApplicationDetail'
+import Messages from './pages/app/deals/Messages'
+import Deals from './pages/app/deals/Deals'
+import DealDetail from './pages/app/deals/DealDetail'
 
 function NotFound() {
   return (
@@ -52,26 +63,26 @@ export default function App() {
         <Route path="/u/:id" element={<Soon title="Public profile" />} />
 
         {/* Landowner */}
-        <Route path="/plots" element={<RequireRole roles={L}><Soon title="My plots" /></RequireRole>} />
-        <Route path="/plots/new" element={<RequireRole roles={L}><Soon title="List a plot" /></RequireRole>} />
-        <Route path="/plots/:id" element={<Soon title="Plot" />} />
-        <Route path="/plots/:id/edit" element={<RequireRole roles={L}><Soon title="Edit plot" /></RequireRole>} />
+        <Route path="/plots" element={<RequireRole roles={L}><MyPlots /></RequireRole>} />
+        <Route path="/plots/new" element={<RequireRole roles={L}><PlotForm /></RequireRole>} />
+        <Route path="/plots/:id" element={<PlotDetail />} />
+        <Route path="/plots/:id/edit" element={<RequireRole roles={L}><PlotForm /></RequireRole>} />
 
         {/* Farmer */}
-        <Route path="/find" element={<RequireRole roles={F}><Soon title="Find land" /></RequireRole>} />
-        <Route path="/find/:id" element={<Soon title="Plot details" />} />
+        <Route path="/find" element={<RequireRole roles={F}><FindLand /></RequireRole>} />
+        <Route path="/find/:id" element={<PlotDetail />} />
 
         {/* Shared deal flow */}
-        <Route path="/applications" element={<Soon title="Applications" />} />
-        <Route path="/applications/:id" element={<Soon title="Application" />} />
-        <Route path="/messages" element={<Soon title="Messages" />} />
-        <Route path="/messages/:applicationId" element={<Soon title="Chat" />} />
-        <Route path="/deals" element={<Soon title="Deals" />} />
-        <Route path="/deals/:id" element={<Soon title="Deal" />} />
+        <Route path="/applications" element={<Applications />} />
+        <Route path="/applications/:id" element={<ApplicationDetail />} />
+        <Route path="/messages" element={<Messages />} />
+        <Route path="/messages/:applicationId" element={<Messages />} />
+        <Route path="/deals" element={<Deals />} />
+        <Route path="/deals/:id" element={<DealDetail />} />
 
         {/* Verifier */}
-        <Route path="/verify" element={<RequireRole roles={V}><Soon title="Verification queue" /></RequireRole>} />
-        <Route path="/verify/plots/:id" element={<RequireRole roles={V}><Soon title="Verify plot" /></RequireRole>} />
+        <Route path="/verify" element={<RequireRole roles={V}><VerifyQueue /></RequireRole>} />
+        <Route path="/verify/plots/:id" element={<RequireRole roles={V}><VerifyPlot /></RequireRole>} />
         <Route path="/verify/disputes" element={<RequireRole roles={V}><Soon title="Disputes" /></RequireRole>} />
         <Route path="/verify/disputes/:id" element={<RequireRole roles={V}><Soon title="Dispute" /></RequireRole>} />
 
