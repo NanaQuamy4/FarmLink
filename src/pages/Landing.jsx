@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
 import HarvestSplitDemo from '../components/HarvestSplitDemo'
+import CountUp from '../components/CountUp'
+import { useReveal } from '../lib/useReveal'
 
 const steps = [
   { icon: 'bi-geo-alt', title: 'List and verify', text: 'A landowner lists an idle plot with photos, size, soil and water access. A verifier checks it before farmers can see it.' },
@@ -12,6 +14,12 @@ const steps = [
 
 const regions = ['Ashanti', 'Bono East', 'Northern', 'Volta', 'Eastern', 'Bono', 'Upper East', 'Central']
 
+const modules = [
+  { icon: 'bi-camera-video', title: 'Education sessions', text: 'Register for expert-led video sessions and keep the notes afterwards.', img: '/images/cabbage-farm.jpg' },
+  { icon: 'bi-people', title: 'Farmer groups', text: 'Join groups by region or crop, with group chat and a notice board.', img: '/images/farmers-weeding.jpg' },
+  { icon: 'bi-basket', title: 'Produce marketplace', text: 'List your harvest, receive offers from buyers, and build your rating.', img: '/images/market-okro-seller.jpg' },
+]
+
 const faqs = [
   { q: 'Is a FarmLink agreement a legal contract?', a: 'No. The agreement is a record of the terms both parties confirmed on the platform, such as crop, duration, inputs and harvest split. It helps prevent misunderstanding and gives a verifier something clear to refer to in a dispute, but it is not a legally binding contract.' },
   { q: 'Does plot verification prove that someone owns the land?', a: 'No. A verifier, usually an extension officer or an approved community verifier such as a farmer association leader, confirms the plot exists and matches its listing. It does not replace the Lands Commission or title registration.' },
@@ -20,27 +28,32 @@ const faqs = [
   { q: 'Can a group of young farmers apply together?', a: 'Yes. A farmer account can be set up as a farmer group with a group name and member count, and apply for plots as one party.' },
 ]
 
+const i = (n) => ({ '--i': n })
+
 export default function Landing() {
+  useReveal()
+
   return (
     <>
+      <SiteNav overlay />
+
       {/* ---------- Hero ---------- */}
       <header className="position-relative p-2 p-md-3">
-        <div className="position-relative overflow-hidden rounded-fl-xl text-white" style={{ minHeight: 'min(92vh, 860px)' }}>
-          <img src="/images/hero-farmer-spraying.jpg" alt="A farmer tending a green field in Ghana" className="position-absolute top-0 start-0 fl-cover" style={{ zIndex: -2 }} fetchpriority="high" />
+        <div className="position-relative overflow-hidden rounded-fl-xl text-white" style={{ minHeight: 'min(92vh, 860px)', isolation: 'isolate' }}>
+          <img src="/images/hero-tomato-harvest.jpg" alt="Freshly harvested tomatoes being poured into crates during tomato season in Koforidua, Ghana" className="position-absolute top-0 start-0 fl-cover fl-kenburns" style={{ zIndex: -2 }} fetchpriority="high" />
           <div className="position-absolute top-0 start-0 w-100 h-100 fl-hero-shade" style={{ zIndex: -1 }} />
-          <SiteNav overlay />
           <div className="container position-relative" style={{ paddingTop: 'clamp(8rem, 18vh, 11rem)', paddingBottom: '9rem' }}>
             <div className="row">
               <div className="col-lg-7 fl-on-dark">
-                <span className="fl-pill dark mb-4"><i className="bi bi-patch-check-fill text-lime" />Verified plots for youth farmers</span>
-                <h1 className="fl-h-hero text-white mb-4">
+                <span className="fl-pill dark mb-4 fl-enter"><i className="bi bi-patch-check-fill text-lime" />Verified plots for youth farmers</span>
+                <h1 className="fl-h-hero text-white mb-4 fl-enter d1">
                   Idle land. Young farmers. <span className="fl-serif text-lime">One fair harvest.</span>
                 </h1>
-                <p className="fl-lead text-white-50 mb-4" style={{ maxWidth: 540 }}>
+                <p className="fl-lead text-white mb-4 fl-enter d2" style={{ maxWidth: 540, opacity: 0.85 }}>
                   FarmLink matches landowners who have unused farmland with young farmers who need it, then keeps
                   a shared record of the terms, the season and the harvest split.
                 </p>
-                <div className="d-flex flex-wrap gap-2">
+                <div className="d-flex flex-wrap gap-2 fl-enter d3">
                   <Link to="/register?role=landowner" className="btn btn-lime btn-lg btn-arrow">List your land <span className="fl-arrow"><i className="bi bi-arrow-up-right" /></span></Link>
                   <Link to="/register?role=farmer" className="btn btn-outline-light-fl btn-lg">Find a plot</Link>
                 </div>
@@ -49,18 +62,22 @@ export default function Landing() {
           </div>
           {/* Floating cards */}
           <div className="position-absolute bottom-0 end-0 p-3 p-md-4 d-none d-md-flex gap-3 align-items-end">
-            <div className="fl-glass" style={{ width: 230 }}>
-              <div className="d-flex align-items-center gap-2 small mb-2"><span className="fl-status verified">Verified</span></div>
-              <div className="fw-semibold">2.5 acres · Techiman</div>
-              <div className="small text-white-50">Loamy soil · Stream nearby</div>
+            <div className="fl-enter d4">
+              <div className="fl-glass fl-bob" style={{ width: 230 }}>
+                <div className="d-flex align-items-center gap-2 small mb-2"><span className="fl-status verified">Verified</span></div>
+                <div className="fw-semibold">2.5 acres · Techiman</div>
+                <div className="small" style={{ opacity: 0.8 }}>Loamy soil · Stream nearby</div>
+              </div>
             </div>
-            <div className="fl-float" style={{ width: 260 }}>
-              <div className="small text-muted-fl mb-1">Harvest split · 42 bags maize</div>
-              <div className="d-flex justify-content-between fw-semibold"><span>Landowner 30%</span><span>11.4</span></div>
-              <div className="d-flex justify-content-between fw-semibold text-deep"><span>Farmer 70%</span><span>30.6</span></div>
-              <div className="progress mt-2" style={{ height: 6 }}>
-                <div className="progress-bar" style={{ width: '27%', background: 'var(--fl-leaf)' }} />
-                <div className="progress-bar bg-primary" style={{ width: '73%' }} />
+            <div className="fl-enter d5">
+              <div className="fl-float fl-bob alt" style={{ width: 260 }}>
+                <div className="small text-muted-fl mb-1">Harvest split · 42 crates tomatoes</div>
+                <div className="d-flex justify-content-between fw-semibold"><span>Landowner 30%</span><span>12.6</span></div>
+                <div className="d-flex justify-content-between fw-semibold text-deep"><span>Farmer 70%</span><span>29.4</span></div>
+                <div className="progress mt-2" style={{ height: 6 }}>
+                  <div className="progress-bar" style={{ width: '30%', background: 'var(--fl-ochre)' }} />
+                  <div className="progress-bar bg-primary" style={{ width: '70%' }} />
+                </div>
               </div>
             </div>
           </div>
@@ -69,16 +86,16 @@ export default function Landing() {
 
       {/* ---------- Regions strip ---------- */}
       <section className="container py-5">
-        <p className="text-center small text-muted-fl mb-4">Built for farming communities across Ghana</p>
+        <p className="text-center small text-muted-fl mb-4" data-reveal>Built for farming communities across Ghana</p>
         <div className="d-flex flex-wrap justify-content-center gap-2">
-          {regions.map((r) => <span className="fl-pill" key={r}><i className="bi bi-geo text-deep" />{r}</span>)}
+          {regions.map((r, n) => <span className="fl-pill" key={r} data-reveal style={i(n)}><i className="bi bi-geo text-deep" />{r}</span>)}
         </div>
       </section>
 
       {/* ---------- Problem statement ---------- */}
       <section className="container pb-5" id="about">
-        <span className="fl-eyebrow mb-3">Why FarmLink</span>
-        <p className="fl-h-section fw-medium mb-0" style={{ fontFamily: 'Outfit', maxWidth: 1050, color: 'var(--fl-ink)' }}>
+        <span className="fl-eyebrow mb-3" data-reveal>Why FarmLink</span>
+        <p className="fl-h-section fw-medium mb-0" data-reveal style={{ fontFamily: 'Outfit', maxWidth: 1050, color: 'var(--fl-ink)', ...i(1) }}>
           Many landowners hold unused plots, and many young people want to farm but cannot get land.{' '}
           <span className="text-muted-fl">Their arrangements are usually verbal, so terms get forgotten and harvests get disputed.</span>{' '}
           FarmLink puts the whole partnership <img src="/images/maize-field.jpg" alt="" className="d-inline-block align-middle rounded-pill object-fit-cover" style={{ width: '6rem', height: '2.6rem' }} /> on record.
@@ -89,16 +106,16 @@ export default function Landing() {
       <section id="how-it-works" className="fl-section fl-section-dark fl-on-dark fl-rounded-band">
         <div className="container">
           <div className="row g-4 align-items-end mb-5">
-            <div className="col-lg-6">
+            <div className="col-lg-6" data-reveal>
               <span className="fl-eyebrow mb-3">How it works</span>
               <h2 className="fl-h-section mb-0">From idle plot to <span className="fl-serif text-lime">recorded harvest</span></h2>
             </div>
-            <div className="col-lg-5 offset-lg-1">
+            <div className="col-lg-5 offset-lg-1" data-reveal style={i(1)}>
               <p className="mb-0">Four steps, each recorded and visible to both parties. If anything goes wrong, either side can raise a dispute and a verifier mediates using the record.</p>
             </div>
           </div>
           <div className="row g-4">
-            <div className="col-lg-5">
+            <div className="col-lg-5" data-reveal="zoom">
               <div className="position-relative h-100 rounded-fl-xl overflow-hidden" style={{ minHeight: 420 }}>
                 <img src="/images/farmers-weeding.jpg" alt="Farmers weeding a field together" className="position-absolute fl-cover" />
                 <div className="position-absolute bottom-0 start-0 end-0 p-3">
@@ -106,9 +123,9 @@ export default function Landing() {
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <span className="fw-semibold">Season tracker</span><span className="fl-status verified">On track</span>
                     </div>
-                    {[['Cleared', 'bi-check-circle-fill', true], ['Planted', 'bi-check-circle-fill', true], ['Weeded', 'bi-check-circle-fill', true], ['Harvested', 'bi-circle', false]].map(([m, ic, done]) => (
-                      <div key={m} className="d-flex align-items-center gap-2 py-1 small">
-                        <i className={`bi ${ic} ${done ? 'text-success' : 'text-muted-fl'}`} /><span className={done ? '' : 'text-muted-fl'}>{m}</span>
+                    {[['Cleared', true], ['Planted', true], ['Weeded', true], ['Harvested', false]].map(([m, done], n) => (
+                      <div key={m} className="d-flex align-items-center gap-2 py-1 small fl-check" style={i(n)}>
+                        <i className={`bi ${done ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted-fl'}`} /><span className={done ? '' : 'text-muted-fl'}>{m}</span>
                       </div>
                     ))}
                   </div>
@@ -116,12 +133,14 @@ export default function Landing() {
               </div>
             </div>
             <div className="col-lg-7 d-grid gap-3">
-              {steps.map((s, i) => (
-                <div className="fl-card-dark d-flex gap-3" key={s.title}>
-                  <span className="fl-icon-tile"><i className={`bi ${s.icon}`} /></span>
-                  <div>
-                    <h3 className="h5 mb-1"><span className="text-lime me-2">0{i + 1}</span>{s.title}</h3>
-                    <p className="mb-0 small">{s.text}</p>
+              {steps.map((s, n) => (
+                <div key={s.title} data-reveal style={i(n)}>
+                  <div className="fl-card-dark fl-lift d-flex gap-3">
+                    <span className="fl-icon-tile"><i className={`bi ${s.icon}`} /></span>
+                    <div>
+                      <h3 className="h5 mb-1"><span className="text-lime me-2">0{n + 1}</span>{s.title}</h3>
+                      <p className="mb-0 small">{s.text}</p>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -133,14 +152,14 @@ export default function Landing() {
       {/* ---------- Audiences ---------- */}
       <section className="fl-section container">
         <div className="row g-4 align-items-end mb-5">
-          <div className="col-lg-6">
+          <div className="col-lg-6" data-reveal>
             <span className="fl-eyebrow mb-3">Who it’s for</span>
             <h2 className="fl-h-section mb-0">One platform, both sides of the field</h2>
           </div>
-          <div className="col-lg-5 offset-lg-1"><p className="fl-lead mb-0">Landowners keep their land productive. Young farmers get access to land and a clear deal. Verifiers keep everyone honest.</p></div>
+          <div className="col-lg-5 offset-lg-1" data-reveal style={i(1)}><p className="fl-lead mb-0">Landowners keep their land productive. Young farmers get access to land and a clear deal. Verifiers keep everyone honest.</p></div>
         </div>
         <div className="row g-4">
-          <div className="col-md-6 col-lg-4" id="landowners">
+          <div className="col-md-6 col-lg-4" id="landowners" data-reveal>
             <Link to="/register?role=landowner" className="fl-img-card">
               <img src="/images/idle-land-green.jpg" alt="Open green farmland" />
               <div className="fl-img-card-body">
@@ -150,7 +169,7 @@ export default function Landing() {
               </div>
             </Link>
           </div>
-          <div className="col-md-6 col-lg-4" id="farmers">
+          <div className="col-md-6 col-lg-4" id="farmers" data-reveal style={i(1)}>
             <Link to="/register?role=farmer" className="fl-img-card">
               <img src="/images/irrigating-farm.jpg" alt="A young farmer watering a field" />
               <div className="fl-img-card-body">
@@ -160,7 +179,7 @@ export default function Landing() {
               </div>
             </Link>
           </div>
-          <div className="col-md-12 col-lg-4">
+          <div className="col-md-12 col-lg-4" data-reveal style={i(2)}>
             <div className="fl-img-card">
               <img src="/images/vegetable-farm.jpg" alt="Rows of vegetables on a farm in Northern Ghana" />
               <div className="fl-img-card-body">
@@ -176,42 +195,44 @@ export default function Landing() {
       {/* ---------- Calculator ---------- */}
       <section id="calculator" className="fl-section pt-0 container">
         <div className="row g-4 align-items-end mb-5">
-          <div className="col-lg-6">
+          <div className="col-lg-6" data-reveal>
             <span className="fl-eyebrow mb-3">Harvest split</span>
             <h2 className="fl-h-section mb-0">Agree the split once. <span className="fl-serif text-deep">Never argue the maths.</span></h2>
           </div>
-          <div className="col-lg-5 offset-lg-1"><p className="fl-lead mb-0">Try it. This is the same rule FarmLink uses when a farmer records the harvest.</p></div>
+          <div className="col-lg-5 offset-lg-1" data-reveal style={i(1)}><p className="fl-lead mb-0">Try it. This is the same rule FarmLink uses when a farmer records the harvest.</p></div>
         </div>
-        <HarvestSplitDemo />
+        <div data-reveal style={i(2)}>
+          <HarvestSplitDemo />
+        </div>
       </section>
 
       {/* ---------- Evidence ---------- */}
       <section className="fl-section pt-0 container">
         <div className="row g-4">
-          <div className="col-lg-5">
+          <div className="col-lg-5" data-reveal="zoom">
             <div className="rounded-fl-xl overflow-hidden h-100" style={{ minHeight: 360 }}>
               <img src="/images/maize-harvest.jpg" alt="A farmer drying harvested maize" className="fl-cover" />
             </div>
           </div>
-          <div className="col-lg-7">
+          <div className="col-lg-7" data-reveal style={i(1)}>
             <div className="fl-card p-4 p-md-5">
               <span className="fl-eyebrow mb-3">The gap</span>
               <h2 className="h2 mb-4">Young farmers are farming with thin support</h2>
               <div className="row g-4">
                 <div className="col-sm-6">
-                  <div className="fl-stat">1 : 1,500</div>
+                  <CountUp className="fl-stat d-block" prefix="1 : " to={1500} />
                   <p className="small text-muted-fl mt-2 mb-0">Extension officers to farmers in Ghana, against an accepted standard of 1 : 500 (Ghanaian Times, 2025).</p>
                 </div>
                 <div className="col-sm-6">
-                  <div className="fl-stat">3×</div>
+                  <CountUp className="fl-stat d-block" to={3} suffix="×" duration={900} />
                   <p className="small text-muted-fl mt-2 mb-0">The recommended workload per officer, so verified, recorded arrangements matter more.</p>
                 </div>
                 <div className="col-sm-6">
-                  <div className="fl-stat text-deep">4</div>
+                  <CountUp className="fl-stat d-block text-deep" to={4} duration={900} />
                   <p className="small text-muted-fl mt-2 mb-0">Season milestones recorded with photos: cleared, planted, weeded, harvested.</p>
                 </div>
                 <div className="col-sm-6">
-                  <div className="fl-stat text-deep">2</div>
+                  <CountUp className="fl-stat d-block text-deep" to={2} duration={900} />
                   <p className="small text-muted-fl mt-2 mb-0">Confirmations on every agreement. Nothing is final until both parties confirm.</p>
                 </div>
               </div>
@@ -224,21 +245,17 @@ export default function Landing() {
       <section className="fl-section fl-section-dark fl-on-dark fl-rounded-band">
         <div className="container">
           <div className="row g-4 align-items-end mb-5">
-            <div className="col-lg-6">
+            <div className="col-lg-6" data-reveal>
               <span className="fl-eyebrow mb-3">Beyond the plot</span>
               <h2 className="fl-h-section mb-0">Learn, connect <span className="fl-serif text-lime">and sell</span></h2>
             </div>
-            <div className="col-lg-5 offset-lg-1"><p className="mb-0">Extended modules help new farmers grow beyond their first season.</p></div>
+            <div className="col-lg-5 offset-lg-1" data-reveal style={i(1)}><p className="mb-0">Extended modules help new farmers grow beyond their first season.</p></div>
           </div>
           <div className="row g-4">
-            {[
-              { icon: 'bi-camera-video', title: 'Education sessions', text: 'Register for expert-led video sessions and keep the notes afterwards.', img: '/images/cabbage-farm.jpg' },
-              { icon: 'bi-people', title: 'Farmer groups', text: 'Join groups by region or crop, with group chat and a notice board.', img: '/images/crop-rows.jpg' },
-              { icon: 'bi-basket', title: 'Produce marketplace', text: 'List your harvest, receive offers from buyers, and build your rating.', img: '/images/market-tomatoes.jpg' },
-            ].map((m) => (
-              <div className="col-md-4" key={m.title}>
-                <div className="fl-card-dark p-0 overflow-hidden">
-                  <img src={m.img} alt="" className="w-100 object-fit-cover" style={{ height: 190 }} loading="lazy" />
+            {modules.map((m, n) => (
+              <div className="col-md-4" key={m.title} data-reveal style={i(n)}>
+                <div className="fl-card-dark fl-lift fl-zoom p-0 overflow-hidden">
+                  <div className="overflow-hidden"><img src={m.img} alt="" className="w-100 object-fit-cover" style={{ height: 190 }} loading="lazy" /></div>
                   <div className="p-4">
                     <span className="fl-icon-tile mb-3"><i className={`bi ${m.icon}`} /></span>
                     <h3 className="h5">{m.title}</h3>
@@ -254,16 +271,16 @@ export default function Landing() {
       {/* ---------- FAQ ---------- */}
       <section id="faq" className="fl-section container">
         <div className="row g-4 g-lg-5">
-          <div className="col-lg-4">
+          <div className="col-lg-4" data-reveal>
             <span className="fl-eyebrow mb-3">FAQ</span>
             <h2 className="fl-h-section">Clear about what FarmLink is, and isn’t</h2>
             <p className="fl-lead">Honest answers to the questions landowners and farmers ask first.</p>
           </div>
           <div className="col-lg-8">
-            <div className="accordion fl-faq" id="faqAcc">
-              {faqs.map((f, i) => (
-                <details className="accordion-item bg-white" key={f.q} open={i === 0}>
-                  <summary className="accordion-button collapsed list-unstyled" style={{ cursor: 'pointer' }}>{f.q}</summary>
+            <div className="accordion fl-faq">
+              {faqs.map((f, n) => (
+                <details className="accordion-item bg-white" key={f.q} open={n === 0} data-reveal style={i(n)}>
+                  <summary className="accordion-button collapsed">{f.q}</summary>
                   <div className="accordion-body pt-0 text-muted-fl">{f.a}</div>
                 </details>
               ))}
@@ -273,7 +290,7 @@ export default function Landing() {
       </section>
 
       {/* ---------- CTA ---------- */}
-      <section className="container">
+      <section className="container" data-reveal="zoom">
         <div className="position-relative overflow-hidden rounded-fl-xl text-white p-4 p-md-5" style={{ isolation: 'isolate' }}>
           <img src="/images/open-farmland-sky.jpg" alt="" className="position-absolute top-0 start-0 fl-cover" style={{ zIndex: -2 }} loading="lazy" />
           <div className="position-absolute top-0 start-0 w-100 h-100" style={{ zIndex: -1, background: 'linear-gradient(90deg, rgba(3,43,31,.92), rgba(3,43,31,.55))' }} />

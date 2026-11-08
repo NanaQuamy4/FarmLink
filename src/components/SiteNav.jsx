@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import Brand from './Brand'
 
@@ -10,13 +10,27 @@ const links = [
   { href: '/#faq', label: 'FAQ' },
 ]
 
-// Public site navigation. `overlay` sits on top of the hero photo with white text.
+// Public site navigation. `overlay` floats over the hero photo with white text,
+// then fills in with deep green once the page is scrolled.
 export default function SiteNav({ overlay = false }) {
   const [open, setOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    if (!overlay) return undefined
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [overlay])
+
+  const navClass = overlay
+    ? `fl-nav-fixed${scrolled ? ' scrolled' : ''}${open ? ' menu-open' : ''}`
+    : 'bg-white border-bottom'
   const tone = overlay ? 'text-white' : 'text-body'
 
   return (
-    <nav className={`navbar navbar-expand-lg ${overlay ? 'position-absolute top-0 start-0 end-0 z-3' : 'bg-white border-bottom'}`}>
+    <nav className={`navbar navbar-expand-lg ${navClass}`}>
       <div className="container">
         <Brand reverse={overlay} />
         <button

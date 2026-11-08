@@ -182,7 +182,7 @@ h1, h2, h3, .display-1, .display-2, .display-3, .display-4, .display-5 { letter-
 
 // Frosted info card that floats over photos
 .fl-glass {
-  background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .28);
+  background: rgba(3, 43, 31, .55); border: 1px solid rgba(255, 255, 255, .22);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   border-radius: var(--fl-radius); color: #fff; padding: 1rem 1.25rem;
 }
@@ -245,8 +245,71 @@ h1, h2, h3, .display-1, .display-2, .display-3, .display-4, .display-5 { letter-
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
 
-// Hero photo shade: darker and top-to-bottom on phones so text stays readable
-.fl-hero-shade { background: linear-gradient(180deg, rgba(3, 43, 31, .78) 0%, rgba(3, 43, 31, .88) 100%); }
+// Hero photo shade: keeps text readable while letting the photo's colour through
+.fl-hero-shade { background: linear-gradient(180deg, rgba(3, 43, 31, .45) 0%, rgba(3, 43, 31, .72) 55%, rgba(3, 43, 31, .5) 100%); }
 @include media-breakpoint-up(lg) {
-  .fl-hero-shade { background: linear-gradient(100deg, rgba(3, 43, 31, .92) 0%, rgba(3, 43, 31, .7) 45%, rgba(3, 43, 31, .15) 100%); }
+  .fl-hero-shade { background:
+    linear-gradient(95deg, rgba(3, 43, 31, .86) 0%, rgba(3, 43, 31, .55) 38%, rgba(3, 43, 31, 0) 66%),
+    linear-gradient(180deg, rgba(3, 43, 31, .35) 0%, rgba(3, 43, 31, 0) 25%); }
+}
+
+// ---------- Motion ----------
+// Entrance on load (.fl-enter + .d1-.d5 delays), scroll reveal ([data-reveal] + .is-visible
+// from useReveal), hover lift (.fl-lift), gentle float (.fl-bob), slow hero zoom (.fl-kenburns).
+$fl-ease: cubic-bezier(.2, .7, .2, 1);
+
+@keyframes fl-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+@keyframes fl-fade-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes fl-kenburns { from { transform: scale(1.12); } to { transform: scale(1); } }
+@keyframes fl-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes fl-pop { 0% { transform: scale(.4); opacity: 0; } 70% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
+
+.fl-enter { animation: fl-up .9s $fl-ease both; }
+@for $n from 1 through 5 { .fl-enter.d#{$n} { animation-delay: #{$n * .12}s; } }
+.fl-kenburns { animation: fl-kenburns 2.6s $fl-ease both; }
+.fl-bob { animation: fl-bob 6s ease-in-out 1.4s infinite; &.alt { animation-delay: 2.6s; } }
+
+[data-reveal] {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity .8s $fl-ease, transform .8s $fl-ease;
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+[data-reveal='zoom'] { transform: scale(.96); }
+[data-reveal].is-visible { opacity: 1; transform: none; }
+
+// Season tracker ticks pop in one by one once its card is revealed
+.fl-check i { display: inline-block; }
+.is-visible .fl-check i { animation: fl-pop .5s $fl-ease both; animation-delay: calc(.4s + var(--i, 0) * .18s); }
+
+.fl-lift {
+  transition: transform .35s $fl-ease, box-shadow .35s $fl-ease, border-color .35s ease;
+  &:hover { transform: translateY(-4px); box-shadow: $box-shadow; }
+  .fl-icon-tile { transition: transform .35s $fl-ease; }
+  &:hover .fl-icon-tile { transform: rotate(-8deg) scale(1.06); }
+}
+.fl-card-dark.fl-lift:hover { border-color: rgba($fl-lime, .35); box-shadow: 0 18px 40px -20px rgba(0, 0, 0, .5); }
+.fl-zoom img { transition: transform .6s $fl-ease; }
+.fl-zoom:hover img { transform: scale(1.05); }
+
+// Fixed navbar that fills in on scroll
+.fl-nav-fixed {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1030; margin: .5rem;
+  border-radius: var(--fl-radius); transition: background-color .35s ease, box-shadow .35s ease, backdrop-filter .35s ease;
+  @include media-breakpoint-up(md) { margin: 1rem; }
+  &.scrolled, &.menu-open {
+    background: rgba($fl-deep, .9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 12px 30px -14px rgba(0, 0, 0, .45);
+  }
+  &.scrolled .fl-nav-pill { background: transparent; border-color: transparent; }
+}
+
+// FAQ: <details> based accordion
+.fl-faq summary { list-style: none; cursor: pointer; }
+.fl-faq summary::-webkit-details-marker { display: none; }
+.fl-faq details[open] > .accordion-button::after { transform: rotate(-180deg); }
+.fl-faq details[open] > .accordion-body { animation: fl-fade-in .35s $fl-ease both; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1 !important; transform: none !important; }
+  .fl-enter, .fl-kenburns, .fl-bob, .fl-check i { animation: none !important; }
 }
