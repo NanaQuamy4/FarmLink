@@ -59,8 +59,23 @@ export function useCanHost() {
   return role === 'admin' || role === 'verifier' || !!profile?.can_host_sessions
 }
 
+// Who can schedule what: approved hosts can open sessions to everyone; group leaders can
+// schedule sessions for the groups they lead.
+export function useHosting() {
+  const { profile } = useAuth()
+  const canPublic = useCanHost()
+  const [ledGroups, setLedGroups] = useState([])
+  useEffect(() => {
+    let live = true
+    supabase.from('group_members').select('groups(id, name)').eq('user_id', profile.id).eq('member_role', 'leader')
+      .then(({ data }) => live && setLedGroups((data || []).map((r) => r.groups).filter(Boolean)))
+    return () => { live = false }
+  }, [profile.id])
+  return { canPublic, ledGroups, canSchedule: canPublic || ledGroups.length > 0 }
+}
+
 // Create or edit a session
-function SessionForm({ profile, session, onDone, onCancel }) {
+function SessionForm({ profile, session, onDone, onCancel, hosting, defaultGroup }) {
   const start = session ? new Date(session.starts_at) : null
   const pad = (n) => String(n).padStart(2, '0')
   const [f, setF] = useState({
@@ -69,6 +84,7 @@ function SessionForm({ profile, session, onDone, onCancel }) {
     date: start ? `${start.getFullYear()}-${pad(start.getMonth() + 1)}-${pad(start.getDate())}` : '',
     time: start ? `${pad(start.getHours())}:${pad(start.getMinutes())}` : '10:00',
     duration_minutes: session?.duration_minutes || 60, capacity: session?.capacity || 100,
+    group_id: session ? session.group_id || '' : defaultGroup || (hosting?.canPublic ? '' : hosting?.ledGroups?.[0]?.id || ''),
   })
   const [err, setErr] = useState('')
   const [uploading, setUploading] = useState(false)
@@ -101,9 +117,10 @@ function SessionForm({ profile, session, onDone, onCancel }) {
     if (!f.title.trim()) return setErr('Give the session a title.')
     if (Number.isNaN(starts.getTime())) return setErr('Choose a date and time.')
     if (!session && starts < new Date()) return setErr('Choose a date and time in the future.')
+    if (!f.group_id && !hosting?.canPublic) return setErr('Choose the group this session is for.')
     const row = {
       title: f.title.trim(), description: f.description || null, topic: f.topic || null, audience: f.audience || null, agenda: f.agenda || null,
-      region: f.region || null, cover_image: f.cover_image, starts_at: starts.toISOString(),
+      region: f.region || null, cover_image: f.cover_image, starts_at: starts.toISOString(), group_id: f.group_id || null,
       duration_minutes: Number(f.duration_minutes), capacity: Number(f.capacity),
     }
     const q = session
@@ -124,6 +141,14 @@ function SessionForm({ profile, session, onDone, onCancel }) {
         <Field className="col-md-4" label="Topic" htmlFor="s-topic"><input id="s-topic" className="form-control" placeholder="e.g. Maize, Soil" value={f.topic} onChange={set('topic')} /></Field>
         <Field className="col-md-7" label="What will you cover?" htmlFor="s-desc"><textarea id="s-desc" className="form-control" rows={3} value={f.description} onChange={set('description')} /></Field>
         <Field className="col-md-5" label="Agenda (one item per line)" htmlFor="s-agenda"><textarea id="s-agenda" className="form-control" rows={3} value={f.agenda} onChange={set('agenda')} /></Field>
+        <Field className="col-12" label="Who can attend?" htmlFor="s-group"
+          hint={f.group_id ? 'Only members of this group see the session and can register. They are notified when you schedule it.' : 'Everyone on FarmLink can see and register for this session.'}>
+          <select id="s-group" className="form-select" value={f.group_id} onChange={set('group_id')}>
+            {(hosting?.canPublic || (session && !session.group_id)) && <option value="">Everyone on FarmLink</option>}
+            {(hosting?.ledGroups || []).map((g) => <option key={g.id} value={g.id}>Members of {g.name}</option>)}
+            {session?.group_id && !(hosting?.ledGroups || []).some((g) => g.id === session.group_id) && <option value={session.group_id}>Members of {session.groups?.name || 'this group'}</option>}
+          </select>
+        </Field>
         <Field className="col-md-6" label="Who is it for?" htmlFor="s-aud"><input id="s-aud" className="form-control" placeholder="e.g. New maize farmers in Bono East" value={f.audience} onChange={set('audience')} /></Field>
         <Field className="col-md-6" label="Region" htmlFor="s-region">
           <select id="s-region" className="form-select" value={f.region} onChange={set('region')}><option value="">All regions</option>{REGIONS.map((r) => <option key={r}>{r}</option>)}</select>
@@ -163,13 +188,15 @@ function SessionForm({ profile, session, onDone, onCancel }) {
 // ---------- List ----------
 export function SessionList() {
   const { profile } = useAuth()
-  const canHost = useCanHost()
+  const hosting = useHosting()
+  const canHost = hosting.canSchedule
+  const [qs] = useSearchParams()
   const [tab, setTab] = useState('upcoming')
-  const [creating, setCreating] = useState(false)
+  const [creating, setCreating] = useState(qs.get('new') === '1')
   const [err, setErr] = useState('')
   const { data, loading, error, reload } = useQuery(async () => {
     const [s, regs, seats] = await Promise.all([
-      supabase.from('sessions').select('*, host:profiles!sessions_host_id_fkey(id, full_name, avatar_url)').order('starts_at'),
+      supabase.from('sessions').select('*, host:profiles!sessions_host_id_fkey(id, full_name, avatar_url), groups(id, name)').order('starts_at'),
       supabase.from('session_registrations').select('session_id, attended_at').eq('user_id', profile.id),
       supabase.rpc('session_seats'),
     ])
@@ -193,7 +220,7 @@ export function SessionList() {
       <PageHeader image="/images/farmer-tablet.webp" eyebrow="Education sessions" title="Learn from experts," accent="wherever you farm."
         text="Live video sessions with extension officers and experts. Join from any phone browser, ask questions and keep the notes."
         actions={canHost && <button type="button" className="btn btn-primary btn-lg" onClick={() => setCreating(!creating)}><i className="bi bi-plus-lg me-1" />Schedule a session</button>} />
-      {creating && <SessionForm profile={profile} onCancel={() => setCreating(false)} onDone={() => { setCreating(false); reload() }} />}
+      {creating && <SessionForm profile={profile} hosting={hosting} defaultGroup={qs.get('group') || ''} onCancel={() => setCreating(false)} onDone={() => { setCreating(false); reload() }} />}
       <div className="d-flex flex-wrap gap-2 mb-4">
         {[['upcoming', 'Upcoming'], ['past', 'Notes & recordings'], ...(canHost ? [['mine', 'Hosted by me']] : [])].map(([k, l]) => (
           <button key={k} type="button" className={`btn btn-sm ${tab === k ? 'btn-primary' : 'btn-outline-primary'}`} onClick={() => setTab(k)}>{l}</button>
@@ -216,7 +243,8 @@ export function SessionList() {
                     <img src={img(s.cover_image || '/images/farmer-tablet.webp', 'sm')} alt="" loading="lazy" />
                     <span className="fl-session-date"><span>{d.toLocaleDateString('en-GB', { month: 'short' })}</span><strong>{d.getDate()}</strong></span>
                     {st === 'live' && <span className="fl-pill lime position-absolute top-0 end-0 m-3"><span className="fl-live-dot" />Live now</span>}
-                    {s.topic && st !== 'live' && <span className="fl-pill glass position-absolute top-0 end-0 m-3">{s.topic}</span>}
+                    {s.groups ? <span className="fl-pill lime position-absolute top-0 end-0 m-3"><i className="bi bi-people-fill" />{s.groups.name}</span>
+                      : s.topic && st !== 'live' && <span className="fl-pill glass position-absolute top-0 end-0 m-3">{s.topic}</span>}
                   </Link>
                   <div className="p-3 d-flex flex-column flex-grow-1">
                     <Link to={`/sessions/${s.id}`} className="fw-semibold text-reset text-decoration-none lh-sm mb-1">{s.title}</Link>
@@ -430,6 +458,7 @@ const CALL_TOOLS = [
 export function SessionDetail() {
   const { id } = useParams()
   const { profile, role } = useAuth()
+  const hosting = useHosting()
   const [params, setParams] = useSearchParams()
   const tab = params.get('tab') || 'overview'
   const setTab = (t) => setParams({ tab: t }, { replace: true })
@@ -441,7 +470,7 @@ export function SessionDetail() {
 
   const { data, loading, error, reload } = useQuery(async () => {
     const [s, reg, regs, sum, res, myFb, allFb] = await Promise.all([
-      supabase.from('sessions').select('*, host:profiles!sessions_host_id_fkey(id, full_name, avatar_url, region, bio)').eq('id', id).single(),
+      supabase.from('sessions').select('*, host:profiles!sessions_host_id_fkey(id, full_name, avatar_url, region, bio), groups(id, name)').eq('id', id).single(),
       supabase.from('session_registrations').select('*').eq('session_id', id).eq('user_id', profile.id).maybeSingle(),
       supabase.from('session_registrations').select('*, profile:profiles!session_registrations_user_id_fkey(id, full_name, is_group, group_name, avatar_url, region)').eq('session_id', id).order('registered_at'),
       supabase.rpc('session_summary', { p_session: id }),
@@ -519,7 +548,7 @@ export function SessionDetail() {
   return (
     <div className="fl-page">
       <Link to="/sessions" className="small d-inline-block mb-3"><i className="bi bi-arrow-left me-1" />Sessions</Link>
-      <PageHeader image={img(s.cover_image || '/images/farmer-tablet.webp')} eyebrow={[s.topic, s.region].filter(Boolean).join(' · ') || 'Education session'} title={s.title}
+      <PageHeader image={img(s.cover_image || '/images/farmer-tablet.webp')} eyebrow={[s.groups ? `Group session · ${s.groups.name}` : null, s.topic, s.region].filter(Boolean).join(' · ') || 'Education session'} title={s.title}
         text={`${fmtDateTime(s.starts_at)} · ${s.duration_minutes} minutes · hosted by ${s.host.full_name}`}
         actions={st === 'live' ? <span className="fl-pill lime"><span className="fl-live-dot" />Live now</span> : st === 'ended' ? <span className="fl-pill dark">Ended</span> : null}
         stats={[
@@ -529,7 +558,8 @@ export function SessionDetail() {
           ...(st !== 'upcoming' ? [{ icon: 'bi-person-check', label: 'Attended', value: sum.attended || 0 }] : []),
         ]} />
       <ErrorAlert error={err} />
-      {editing && <SessionForm profile={profile} session={s} onCancel={() => setEditing(false)} onDone={() => { setEditing(false); reload() }} />}
+      {editing && <SessionForm profile={profile} session={s} hosting={hosting} onCancel={() => setEditing(false)} onDone={() => { setEditing(false); reload() }} />}
+      {s.groups && <div className="alert alert-light border d-flex align-items-center gap-2"><i className="bi bi-people-fill text-deep" />This session is for members of <Link to={`/groups/${s.groups.id}`}>{s.groups.name}</Link>. Only they can see it and register.</div>}
 
       <div className="row g-4">
         <div className="col-lg-8">

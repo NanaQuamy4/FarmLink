@@ -6,7 +6,7 @@ import { useQuery } from '../../../lib/useQuery'
 import { PageHeader, Loading, ErrorAlert, EmptyState, Avatar, ActionButton, Field } from '../../../components/ui'
 import ChatThread from '../../../components/ChatThread'
 import { REGIONS, CROPS } from '../../../lib/constants'
-import { timeAgo, displayName } from '../../../lib/format'
+import { timeAgo, displayName, fmtDateTime } from '../../../lib/format'
 
 // FR12: farmer community groups by region or crop.
 export function GroupList() {
@@ -78,18 +78,19 @@ export function GroupDetail() {
   const [notice, setNotice] = useState({ title: '', body: '' })
   const [err, setErr] = useState('')
   const { data, loading, error, reload } = useQuery(async () => {
-    const [g, members, notices] = await Promise.all([
+    const [g, members, notices, sessions] = await Promise.all([
       supabase.from('groups').select('*').eq('id', id).single(),
       supabase.from('group_members').select('*, profile:profiles!group_members_user_id_fkey(id, full_name, is_group, group_name, avatar_url, region)').eq('group_id', id).order('joined_at'),
       supabase.from('messages').select('*, sender:profiles!messages_sender_id_fkey(full_name)').eq('group_id', id).eq('is_notice', true).order('pinned', { ascending: false }).order('created_at', { ascending: false }),
+      supabase.from('sessions').select('id, title, starts_at, cover_image').eq('group_id', id).gte('starts_at', new Date(Date.now() - 2 * 3600e3).toISOString()).order('starts_at'),
     ])
     if (g.error) throw g.error
-    return { g: g.data, members: members.data || [], notices: notices.data || [] }
+    return { g: g.data, members: members.data || [], notices: notices.data || [], sessions: sessions.data || [] }
   }, [id])
 
   if (loading && !data) return <Loading />
   if (error) return <ErrorAlert error={error} onRetry={reload} />
-  const { g, members, notices } = data
+  const { g, members, notices, sessions } = data
   const me = members.find((m) => m.user_id === profile.id)
   const isLeader = me?.member_role === 'leader' || role === 'admin'
 
@@ -147,6 +148,20 @@ export function GroupDetail() {
                   <button className="btn btn-outline-primary btn-sm justify-self-start" style={{ justifySelf: 'start' }}>Post notice</button>
                 </form>
               )}
+            </section>
+            <section className="fl-card p-4 h-auto">
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <h2 className="h5 mb-0"><i className="bi bi-camera-video me-1" />Group sessions</h2>
+                {isLeader && <Link to={`/sessions?new=1&group=${id}`} className="btn btn-sm btn-primary"><i className="bi bi-plus-lg me-1" />Schedule</Link>}
+              </div>
+              {sessions.length === 0 ? (
+                <p className="small text-muted-fl mb-0">{isLeader ? 'Run a session for your members: a field demo, a planning meeting or a guest expert.' : 'No upcoming sessions for this group.'}</p>
+              ) : sessions.map((x) => (
+                <Link key={x.id} to={`/sessions/${x.id}`} className="fl-list-item px-0">
+                  <span className="fl-icon-tile soft flex-none"><i className="bi bi-calendar-event" /></span>
+                  <div className="min-w-0"><div className="fw-semibold text-truncate">{x.title}</div><div className="small text-muted-fl">{fmtDateTime(x.starts_at)}</div></div>
+                </Link>
+              ))}
             </section>
             <section className="fl-card p-4">
               <h2 className="h5">Members <span className="text-muted-fl fw-normal">({members.length})</span></h2>

@@ -44,6 +44,7 @@ beforeAll(async () => {
   await db.exec(sql('supabase/migrations/0005_sessions_plus.sql'))
   await db.exec(sql('supabase/migrations/0006_support.sql'))
   await db.exec(sql('supabase/migrations/0007_session_covers.sql'))
+  await db.exec(sql('supabase/migrations/0008_group_sessions.sql'))
   for (const r of (await db.query('select id, email from auth.users')).rows) ids[r.email.split('@')[0]] = r.id
 }, 60000)
 
@@ -414,8 +415,51 @@ describe('session cover uploads (0007)', () => {
     await expect(put('officer', ids.officer)).resolves.toHaveLength(1)
     await expect(put('officer', ids.kwame)).rejects.toThrow()
   })
-  it('people who cannot host cannot upload covers', async () => {
-    await expect(put('kwame', ids.kwame)).rejects.toThrow()
+  it('people who cannot host and lead no group cannot upload covers', async () => {
+    await expect(put('buyer', ids.buyer)).rejects.toThrow()
+  })
+  it('group leaders can upload covers for their group sessions', async () => {
+    await expect(put('kwame', ids.kwame)).resolves.toHaveLength(1)
+  })
+})
+
+describe('community sessions for groups (0008)', () => {
+  // Kwame leads "Techiman Maize Growers"; Esi (group) and Ama are members; Efua is not
+  const g = `(select id from groups where name = 'Techiman Maize Growers')`
+  const groupSession = `insert into sessions (host_id, title, starts_at, group_id) values (auth.uid(), 'Group: spacing maize', now() + interval '2 days', ${g}) returning id`
+
+  it('a group leader can schedule for their group, but not a public session', async () => {
+    await expect(as('kwame', groupSession)).resolves.toHaveLength(1)
+    await expect(as('kwame', `insert into sessions (host_id, title, starts_at) values (auth.uid(), 'Public talk', now() + interval '2 days')`)).rejects.toThrow()
+  })
+
+  it('a member who is not the leader cannot schedule for the group', async () => {
+    await expect(as('group', groupSession)).rejects.toThrow()
+  })
+
+  it('only members see the group session; members are notified', async () => {
+    let r
+    await db.transaction(async (tx) => {
+      const asUser = async (who) => { await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ sub: ids[who] })]); await tx.exec('set local role authenticated') }
+      await asUser('kwame')
+      const sid = (await tx.query(groupSession)).rows[0].id
+      await asUser('group')
+      const member = (await tx.query('select count(*)::int n from sessions where id = $1', [sid])).rows[0].n
+      const notified = (await tx.query(`select count(*)::int n from notifications where user_id = auth.uid() and title like 'New group session%'`)).rows[0].n
+      await asUser('efua')
+      const outsider = (await tx.query('select count(*)::int n from sessions where id = $1', [sid])).rows[0].n
+      let blocked = false
+      await tx.query('savepoint s')
+      try { await tx.query('insert into session_registrations (session_id, user_id) values ($1, auth.uid())', [sid]) } catch { blocked = true }
+      await tx.query('rollback to savepoint s')
+      r = { member, notified, outsider, blocked }
+      await tx.rollback()
+    }).catch(() => {})
+    expect(r).toEqual({ member: 1, notified: 1, outsider: 0, blocked: true })
+  })
+
+  it('public sessions are still visible to everyone', async () => {
+    expect(await count('efua', `select count(*) n from sessions where group_id is null`)).toBe(4)
   })
 })
 
