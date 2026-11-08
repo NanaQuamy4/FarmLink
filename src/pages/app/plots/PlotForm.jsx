@@ -75,7 +75,7 @@ export default function PlotForm() {
       const uploads = [...newPhotos.map((f) => [f, false]), ...newDocs.map((f) => [f, true])]
       for (let i = 0; i < uploads.length; i++) {
         const [file, isDoc] = uploads[i]
-        const path = await uploadPhoto('plot-photos', plotId, file)
+        const path = await uploadPhoto('plot-photos', isDoc ? `${plotId}/docs` : plotId, file)
         const { error: err } = await supabase.from('plot_photos').insert({ plot_id: plotId, storage_path: path, is_document: isDoc, sort_order: start + i, uploaded_by: profile.id })
         if (err) throw err
       }

@@ -46,6 +46,7 @@ beforeAll(async () => {
   await db.exec(sql('supabase/migrations/0007_session_covers.sql'))
   await db.exec(sql('supabase/migrations/0008_group_sessions.sql'))
   await db.exec(sql('supabase/migrations/0009_group_chat.sql'))
+  await db.exec(sql('supabase/migrations/0010_security_fixes.sql'))
   for (const r of (await db.query('select id, email from auth.users')).rows) ids[r.email.split('@')[0]] = r.id
 }, 60000)
 

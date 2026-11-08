@@ -4,7 +4,7 @@ import { supabase, errorMessage } from '../../lib/supabase'
 import { useAuth } from '../../lib/auth'
 import { useQuery } from '../../lib/useQuery'
 import { PageHeader, Loading, ErrorAlert, EmptyState, ActionButton, Field, Avatar } from '../../components/ui'
-import { fmtDateTime, timeAgo, displayName } from '../../lib/format'
+import { fmtDateTime, timeAgo, displayName, safeAppPath } from '../../lib/format'
 import { ROLE_LABELS } from '../../lib/constants'
 import { dayLabel, timeOf, sameRun, useChatPresence, typingText } from '../../lib/chat'
 
@@ -113,7 +113,7 @@ function NewTicket({ onCreated }) {
   async function submit() {
     setErr('')
     if (f.subject.trim().length < 3 || !f.body.trim()) return setErr('Add a short subject and describe the problem.')
-    const { data: t, error } = await supabase.from('support_tickets').insert({ user_id: profile.id, category: f.category, subject: f.subject.trim(), related_link: f.related_link || null }).select().single()
+    const { data: t, error } = await supabase.from('support_tickets').insert({ user_id: profile.id, category: f.category, subject: f.subject.trim(), related_link: safeAppPath(f.related_link) }).select().single()
     if (error) return setErr(errorMessage(error))
     const m = await supabase.from('support_messages').insert({ ticket_id: t.id, sender_id: profile.id, body: f.body.trim() })
     if (m.error) return setErr(errorMessage(m.error))
@@ -134,7 +134,7 @@ function NewTicket({ onCreated }) {
         <Field className="col-12" label="Describe the problem" htmlFor="t-body" hint="What you were doing, what happened, and what you expected.">
           <textarea id="t-body" className="form-control" rows={4} maxLength={4000} value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} />
         </Field>
-        {f.related_link && <div className="col-12 small text-muted-fl"><i className="bi bi-link-45deg me-1" />About: <Link to={f.related_link}>{f.related_link}</Link></div>}
+        {safeAppPath(f.related_link) && <div className="col-12 small text-muted-fl"><i className="bi bi-link-45deg me-1" />About: <Link to={f.related_link}>{f.related_link}</Link></div>}
       </div>
       <ActionButton className="btn btn-primary mt-3" onClick={submit}><i className="bi bi-send me-1" />Send to support</ActionButton>
     </section>
@@ -222,7 +222,7 @@ export function TicketPage() {
         <div>
           <div className="small text-muted-fl">{CATEGORIES[t.category]} · opened {fmtDateTime(t.created_at)}</div>
           <h1 className="h3 mb-1">{t.subject}</h1>
-          {t.related_link && <div className="small"><i className="bi bi-link-45deg me-1" />About <Link to={t.related_link}>{t.related_link}</Link></div>}
+          {safeAppPath(t.related_link) && <div className="small"><i className="bi bi-link-45deg me-1" />About <Link to={t.related_link}>{t.related_link}</Link></div>}
         </div>
         <div className="d-flex gap-2 align-items-center">
           <Status s={t.status} />

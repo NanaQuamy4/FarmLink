@@ -26,3 +26,7 @@ export const initials = (name = '') =>
   name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('') || '?'
 
 export const displayName = (p) => (p ? (p.is_group && p.group_name ? p.group_name : p.full_name) : '')
+
+// Links from the database are only followed when they are plain web links or site paths
+export const safeWebUrl = (u) => (typeof u === 'string' && /^https?:\/\//i.test(u.trim()) ? u.trim() : null)
+export const safeAppPath = (p) => (typeof p === 'string' && /^\/(?!\/)/.test(p) && !p.includes('\\') ? p : null)

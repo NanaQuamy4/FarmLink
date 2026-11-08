@@ -7,7 +7,7 @@ import { photoUrl, compressImage } from '../../../lib/storage'
 import { img } from '../../../lib/img'
 import { PageHeader, Loading, ErrorAlert, EmptyState, ActionButton, Field, Avatar } from '../../../components/ui'
 import { REGIONS } from '../../../lib/constants'
-import { fmtDateTime, displayName, timeAgo } from '../../../lib/format'
+import { fmtDateTime, displayName, timeAgo, safeWebUrl } from '../../../lib/format'
 
 // FR13/FR14: education sessions. Hosts are verifiers, admins and experts an admin approved.
 // Video runs on Jitsi Meet in a new tab (free, no time limit; embedding meet.jit.si is limited
@@ -398,7 +398,7 @@ function Materials({ s, isHost, reload, resources }) {
     }
   }
   async function open(r) {
-    const url = r.url || (await photoUrl(r.storage_path, 'session-files'))
+    const url = safeWebUrl(r.url || (await photoUrl(r.storage_path, 'session-files')))
     if (url) window.open(url, '_blank', 'noopener')
   }
   async function remove(r) {

@@ -121,7 +121,7 @@ export function GroupDetail() {
     reload()
   }
   async function togglePin(n) {
-    const { error: e } = await supabase.from('messages').update({ pinned: !n.pinned }).eq('id', n.id)
+    const { error: e } = await supabase.rpc('set_message_pinned', { p_message: n.id, p_pinned: !n.pinned })
     if (e) return setErr(errorMessage(e))
     reload()
   }
