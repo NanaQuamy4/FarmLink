@@ -253,6 +253,10 @@ h1, h2, h3, .display-1, .display-2, .display-3, .display-4, .display-5 { letter-
     linear-gradient(180deg, rgba(3, 43, 31, .35) 0%, rgba(3, 43, 31, 0) 25%); }
 }
 
+// Hero photo framing: keep the farmer in view on every screen size
+.fl-hero-img { object-position: 74% 0%; transform-origin: 70% 20%; }
+@include media-breakpoint-up(lg) { .fl-hero-img { object-position: center 0%; } }
+
 // ---------- Motion ----------
 // Entrance on load (.fl-enter + .d1-.d5 delays), scroll reveal ([data-reveal] + .is-visible
 // from useReveal), hover lift (.fl-lift), gentle float (.fl-bob), slow hero zoom (.fl-kenburns).

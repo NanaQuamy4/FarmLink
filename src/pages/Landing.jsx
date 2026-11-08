@@ -40,11 +40,11 @@ export default function Landing() {
       {/* ---------- Hero ---------- */}
       <header className="position-relative p-2 p-md-3">
         <div className="position-relative overflow-hidden rounded-fl-xl text-white" style={{ minHeight: 'min(92vh, 860px)', isolation: 'isolate' }}>
-          <img src="/images/hero-tomato-harvest.jpg" alt="Freshly harvested tomatoes being poured into crates during tomato season in Koforidua, Ghana" className="position-absolute top-0 start-0 fl-cover fl-kenburns" style={{ zIndex: -2 }} fetchpriority="high" />
+          <img src="/images/hero-farmer-maize.jpg" alt="A smiling young farmer with a hoe showing his healthy green maize field" className="position-absolute top-0 start-0 fl-cover fl-kenburns fl-hero-img" style={{ zIndex: -2 }} fetchpriority="high" />
           <div className="position-absolute top-0 start-0 w-100 h-100 fl-hero-shade" style={{ zIndex: -1 }} />
           <div className="container position-relative" style={{ paddingTop: 'clamp(8rem, 18vh, 11rem)', paddingBottom: '9rem' }}>
             <div className="row">
-              <div className="col-lg-7 fl-on-dark">
+              <div className="col-lg-6 fl-on-dark">
                 <span className="fl-pill dark mb-4 fl-enter"><i className="bi bi-patch-check-fill text-lime" />Verified plots for youth farmers</span>
                 <h1 className="fl-h-hero text-white mb-4 fl-enter d1">
                   Idle land. Young farmers. <span className="fl-serif text-lime">One fair harvest.</span>
@@ -71,7 +71,7 @@ export default function Landing() {
             </div>
             <div className="fl-enter d5">
               <div className="fl-float fl-bob alt" style={{ width: 260 }}>
-                <div className="small text-muted-fl mb-1">Harvest split · 42 crates tomatoes</div>
+                <div className="small text-muted-fl mb-1">Harvest split · 42 bags maize</div>
                 <div className="d-flex justify-content-between fw-semibold"><span>Landowner 30%</span><span>12.6</span></div>
                 <div className="d-flex justify-content-between fw-semibold text-deep"><span>Farmer 70%</span><span>29.4</span></div>
                 <div className="progress mt-2" style={{ height: 6 }}>
@@ -292,7 +292,7 @@ export default function Landing() {
       {/* ---------- CTA ---------- */}
       <section className="container" data-reveal="zoom">
         <div className="position-relative overflow-hidden rounded-fl-xl text-white p-4 p-md-5" style={{ isolation: 'isolate' }}>
-          <img src="/images/open-farmland-sky.jpg" alt="" className="position-absolute top-0 start-0 fl-cover" style={{ zIndex: -2 }} loading="lazy" />
+          <img src="/images/hero-tomato-harvest.jpg" alt="" className="position-absolute top-0 start-0 fl-cover" style={{ zIndex: -2 }} loading="lazy" />
           <div className="position-absolute top-0 start-0 w-100 h-100" style={{ zIndex: -1, background: 'linear-gradient(90deg, rgba(3,43,31,.92), rgba(3,43,31,.55))' }} />
           <div className="row align-items-center g-4 py-md-4">
             <div className="col-lg-7">
