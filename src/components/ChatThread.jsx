@@ -18,7 +18,12 @@ export default function ChatThread({ applicationId, groupId, canSend = true, hei
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [firstUnread, setFirstUnread] = useState(null)
+  const [members, setMembers] = useState([])        // group members, for @mentions
+  const [mentionQuery, setMentionQuery] = useState(null)
+  const [mentionPick, setMentionPick] = useState(0)
+  const [pendingMentions, setPendingMentions] = useState([])
   const listRef = useRef(null)
+  const inputRef = useRef(null)
   const key = applicationId ? 'application_id' : 'group_id'
   const threadId = applicationId || groupId
   const isGroup = Boolean(groupId)
@@ -40,6 +45,11 @@ export default function ChatThread({ applicationId, groupId, canSend = true, hei
         setLoading(false)
       })
     if (applicationId) supabase.rpc('mark_thread_read', { p_application: applicationId })
+    if (groupId) {
+      supabase.rpc('mark_group_read', { p_group: groupId })
+      supabase.from('group_members').select('user_id, profile:profiles!group_members_user_id_fkey(id, full_name, is_group, group_name, avatar_url)')
+        .eq('group_id', groupId).then(({ data }) => live && setMembers((data || []).map((r) => r.profile).filter(Boolean)))
+    }
 
     const channel = supabase.channel(`chat:${threadId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `${key}=eq.${threadId}` }, async (payload) => {
@@ -48,6 +58,7 @@ export default function ChatThread({ applicationId, groupId, canSend = true, hei
         if (!live || !data) return
         setMessages((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data]))
         if (applicationId && data.sender_id !== profile.id) supabase.rpc('mark_thread_read', { p_application: applicationId })
+        if (groupId && data.sender_id !== profile.id && !document.hidden) supabase.rpc('mark_group_read', { p_group: groupId })
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `${key}=eq.${threadId}` }, (payload) => {
         // read receipts: the other person opened the chat
@@ -69,14 +80,58 @@ export default function ChatThread({ applicationId, groupId, canSend = true, hei
     setText('')
     setError('')
     notifyStopped()
-    const { data, error: err } = await supabase.from('messages').insert({ [key]: threadId, sender_id: profile.id, body }).select(`*, ${SENDER}`).single()
+    setMentionQuery(null)
+    const mentions = isGroup ? pendingMentions.filter((id) => { const m = members.find((x) => x.id === id); return m && body.includes(`@${displayName(m)}`) }) : []
+    const row = { [key]: threadId, sender_id: profile.id, body, ...(isGroup ? { mentions } : {}) }
+    const { data, error: err } = await supabase.from('messages').insert(row).select(`*, ${SENDER}`).single()
     if (err) {
       setError(errorMessage(err))
       setText(body)
       return
     }
     setFirstUnread(null)
+    setPendingMentions([])
     setMessages((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data]))
+  }
+
+  // @mention picker: shows while the word before the cursor starts with @
+  const candidates = mentionQuery === null ? [] : members
+    .filter((m) => m.id !== profile.id && displayName(m).toLowerCase().includes(mentionQuery.toLowerCase()))
+    .slice(0, 6)
+  function onType(value, caret) {
+    setText(value)
+    if (value) notifyTyping(); else notifyStopped()
+    if (!isGroup) return
+    const match = /(^|\s)@([^\s@]{0,30})$/.exec(value.slice(0, caret))
+    setMentionQuery(match ? match[2] : null)
+    setMentionPick(0)
+  }
+  function pickMention(m) {
+    const el = inputRef.current
+    const caret = el ? el.selectionStart : text.length
+    const before = text.slice(0, caret).replace(/@([^\s@]{0,30})$/, `@${displayName(m)} `)
+    const next = before + text.slice(caret)
+    setText(next)
+    setPendingMentions((p) => (p.includes(m.id) ? p : [...p, m.id]))
+    setMentionQuery(null)
+    requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(before.length, before.length) } })
+  }
+  function onKeyDown(e) {
+    if (candidates.length) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); setMentionPick((i) => (i + 1) % candidates.length); return }
+      if (e.key === 'ArrowUp') { e.preventDefault(); setMentionPick((i) => (i - 1 + candidates.length) % candidates.length); return }
+      if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); pickMention(candidates[mentionPick]); return }
+      if (e.key === 'Escape') { setMentionQuery(null); return }
+    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(e) }
+  }
+
+  // Message text with @mentions highlighted
+  function renderBody(m) {
+    const names = (m.mentions || []).map((id) => members.find((x) => x.id === id)).filter(Boolean).map((x) => `@${displayName(x)}`)
+    if (!names.length) return m.body
+    const parts = m.body.split(new RegExp(`(${names.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'g'))
+    return parts.map((p, i) => (names.includes(p) ? <span key={i} className="fl-mention">{p}</span> : p))
   }
 
   // Status line: who is online, or who is typing
@@ -105,9 +160,9 @@ export default function ChatThread({ applicationId, groupId, canSend = true, hei
               {m.id === firstUnread && <div className="fl-chat-unread"><span>New messages</span></div>}
               <div className={`d-flex gap-2 align-items-end ${mine ? 'flex-row-reverse' : ''} ${startsRun ? 'mt-2' : 'mt-1'}`}>
                 {!mine && named && (endsRun ? <Avatar profile={m.sender} size={28} /> : <span className="flex-none" style={{ width: 28 }} />)}
-                <div className={`fl-bubble ${mine ? 'me' : 'them'} ${startsRun ? 'first' : ''} ${endsRun ? 'last' : ''} fl-swap`}>
+                <div className={`fl-bubble ${mine ? 'me' : 'them'} ${startsRun ? 'first' : ''} ${endsRun ? 'last' : ''} ${!mine && (m.mentions || []).includes(profile.id) ? 'mentions-me' : ''} fl-swap`}>
                   {named && !mine && startsRun && <strong className="d-block small" style={{ color: nameColor(m.sender_id) }}>{displayName(m.sender)}</strong>}
-                  <span style={{ whiteSpace: 'pre-wrap' }}>{m.body}</span>
+                  <span style={{ whiteSpace: 'pre-wrap' }}>{renderBody(m)}</span>
                   <span className="fl-bubble-meta" title={fmtDateTime(m.created_at)}>
                     {timeOf(m.created_at)}
                     {mine && applicationId && <i className={`bi ${m.read_at ? 'bi-check2-all fl-read' : 'bi-check2'} ms-1`} aria-label={m.read_at ? `Read ${fmtDateTime(m.read_at)}` : 'Sent'} />}
@@ -123,12 +178,22 @@ export default function ChatThread({ applicationId, groupId, canSend = true, hei
       </div>
       {error && <div className="alert alert-danger py-1 px-2 small m-2 mb-0">{error}</div>}
       {canSend ? (
-        <form onSubmit={send} className="d-flex gap-2 p-2 border-top bg-white">
+        <form onSubmit={send} className="d-flex gap-2 p-2 border-top bg-white position-relative">
+          {candidates.length > 0 && (
+            <div className="fl-mention-menu shadow-lg" role="listbox" aria-label="Mention a member">
+              {candidates.map((m, i) => (
+                <button key={m.id} type="button" role="option" aria-selected={i === mentionPick} className={`fl-mention-option ${i === mentionPick ? 'active' : ''}`}
+                  onMouseDown={(e) => { e.preventDefault(); pickMention(m) }}>
+                  <Avatar profile={m} size={26} /><span>{displayName(m)}</span>
+                </button>
+              ))}
+            </div>
+          )}
           <label htmlFor={`msg-${threadId}`} className="visually-hidden">Message</label>
-          <textarea id={`msg-${threadId}`} className="form-control" rows={1} placeholder={placeholder} value={text} maxLength={4000}
-            onChange={(e) => { setText(e.target.value); if (e.target.value) notifyTyping(); else notifyStopped() }}
-            onBlur={notifyStopped}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(e) } }} style={{ resize: 'none' }} />
+          <textarea ref={inputRef} id={`msg-${threadId}`} className="form-control" rows={1} placeholder={isGroup ? `${placeholder} Type @ to mention someone` : placeholder} value={text} maxLength={4000}
+            onChange={(e) => onType(e.target.value, e.target.selectionStart)}
+            onBlur={() => { notifyStopped(); setTimeout(() => setMentionQuery(null), 150) }}
+            onKeyDown={onKeyDown} style={{ resize: 'none' }} />
           <button className="btn btn-primary rounded-circle p-0 flex-none" style={{ width: 44, height: 44 }} aria-label="Send" disabled={!text.trim()}><i className="bi bi-send-fill" /></button>
         </form>
       ) : (

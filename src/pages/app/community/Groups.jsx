@@ -15,7 +15,15 @@ export function GroupList() {
   const [creating, setCreating] = useState(false)
   const [f, setF] = useState({ name: '', description: '', region: profile.region || '', crop: '' })
   const [err, setErr] = useState('')
-  const { data, loading, error, reload } = useQuery(() => supabase.from('groups').select('*, group_members(user_id)').order('created_at', { ascending: false }), [])
+  const { data, loading, error, reload } = useQuery(async () => {
+    const [gs, unread] = await Promise.all([
+      supabase.from('groups').select('*, group_members(user_id)').order('created_at', { ascending: false }),
+      supabase.rpc('group_unread_counts'),
+    ])
+    if (gs.error) throw gs.error
+    const counts = Object.fromEntries((unread.data || []).map((r) => [r.group_id, r.unread]))
+    return gs.data.map((x) => ({ ...x, unread: counts[x.id] || 0 }))
+  }, [])
   const rows = (data || []).filter((g) => !q || [g.name, g.region, g.crop, g.description].join(' ').toLowerCase().includes(q.toLowerCase()))
   const mine = rows.filter((g) => g.group_members.some((m) => m.user_id === profile.id))
   const others = rows.filter((g) => !g.group_members.some((m) => m.user_id === profile.id))
@@ -35,7 +43,8 @@ export function GroupList() {
 
   const Card = ({ g, member }) => (
     <div className="col-md-6 col-xl-4">
-      <div className="fl-card fl-lift p-4 h-100 d-flex flex-column">
+      <div className="fl-card fl-lift p-4 h-100 d-flex flex-column position-relative">
+        {member && g.unread > 0 && <span className="fl-unread-badge" aria-label={`${g.unread} unread messages`}>{g.unread > 99 ? '99+' : g.unread}</span>}
         <div className="d-flex gap-3 mb-2">
           <span className="fl-icon-tile flex-none"><i className={`bi ${g.crop ? 'bi-flower1' : 'bi-geo-alt'}`} /></span>
           <div className="min-w-0"><Link to={`/groups/${g.id}`} className="fw-semibold text-reset d-block text-truncate">{g.name}</Link><div className="small text-muted-fl">{[g.crop, g.region].filter(Boolean).join(' · ') || 'Open group'} · {g.group_members.length} members</div></div>

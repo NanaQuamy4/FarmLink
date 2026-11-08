@@ -128,15 +128,16 @@ export function FarmerHome({ profile }) {
   const { data, loading, error, reload } = useQuery(async () => {
     let suggested = supabase.from('plots').select(PLOT_SELECT).eq('status', 'verified').order('created_at', { ascending: false }).limit(3)
     if (profile.region) suggested = suggested.eq('region', profile.region)
-    const [plots, apps, deals, sessions, groups] = await Promise.all([
+    const [plots, apps, deals, sessions, groups, unread] = await Promise.all([
       suggested,
       supabase.from('applications').select('id, status, planned_crop, created_at, plots(title)').eq('farmer_id', me).order('created_at', { ascending: false }),
       supabase.from('deals').select(DEAL_SELECT).eq('farmer_id', me).order('created_at', { ascending: false }),
       supabase.from('sessions').select('id, title, starts_at, topic, host:profiles!sessions_host_id_fkey(full_name)').gte('starts_at', new Date().toISOString()).order('starts_at').limit(3),
       supabase.from('group_members').select('groups(id, name, region, crop)').eq('user_id', me),
+      supabase.rpc('group_unread_counts'),
     ])
     for (const r of [plots, apps, deals]) if (r.error) throw r.error
-    return { plots: plots.data, apps: apps.data, deals: deals.data, sessions: sessions.data || [], groups: (groups.data || []).map((g) => g.groups), todos: await dealTodos(deals.data, me) }
+    return { plots: plots.data, apps: apps.data, deals: deals.data, sessions: sessions.data || [], groups: (groups.data || []).map((g) => g.groups), groupUnread: (unread.data || []).reduce((a, r) => a + r.unread, 0), todos: await dealTodos(deals.data, me) }
   }, [me, profile.region])
 
   const live = (data?.deals || []).filter((d) => ['drafting', 'active', 'harvested'].includes(d.status))
@@ -192,6 +193,7 @@ export function FarmerHome({ profile }) {
                 <Link to="/groups" className="fl-img-card" style={{ minHeight: 230 }}>
                   <img src="/images/sm/farmers-weeding.webp" alt="" loading="lazy" />
                   <span className="fl-card-arrow" aria-hidden="true"><i className="bi bi-arrow-up-right" /></span>
+                  {data.groupUnread > 0 && <span className="fl-unread-badge" style={{ top: '1rem', right: '1rem' }}>{data.groupUnread > 99 ? '99+' : data.groupUnread} new</span>}
                   <div className="fl-img-card-body pe-5">
                     {data.groups.length ? (
                       <><h3 className="h5 mb-1">{data.groups.map((g) => g.name).join(', ')}</h3><div className="small" style={{ opacity: 0.85 }}>Labour days, shared inputs and the notice board.</div></>

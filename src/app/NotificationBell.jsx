@@ -11,6 +11,7 @@ const ICONS = {
   harvest_recorded: 'bi-basket', deal_completed: 'bi-trophy', dispute_opened: 'bi-shield-exclamation', dispute_assigned: 'bi-shield-check',
   dispute_updated: 'bi-shield', offer_new: 'bi-tag', offer_accepted: 'bi-bag-check', offer_declined: 'bi-bag-x',
   verifier_request: 'bi-person-badge', verifier_approved: 'bi-person-check',
+  mention: 'bi-at', group_message: 'bi-people',
   support_ticket: 'bi-headset', support_reply: 'bi-headset', support_closed: 'bi-check2-circle',
   session_registered: 'bi-calendar-check', session_update: 'bi-camera-video', question_answered: 'bi-chat-square-quote', host_approved: 'bi-mic',
 }

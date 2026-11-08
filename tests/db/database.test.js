@@ -45,6 +45,7 @@ beforeAll(async () => {
   await db.exec(sql('supabase/migrations/0006_support.sql'))
   await db.exec(sql('supabase/migrations/0007_session_covers.sql'))
   await db.exec(sql('supabase/migrations/0008_group_sessions.sql'))
+  await db.exec(sql('supabase/migrations/0009_group_chat.sql'))
   for (const r of (await db.query('select id, email from auth.users')).rows) ids[r.email.split('@')[0]] = r.id
 }, 60000)
 
@@ -460,6 +461,59 @@ describe('community sessions for groups (0008)', () => {
 
   it('public sessions are still visible to everyone', async () => {
     expect(await count('efua', `select count(*) n from sessions where group_id is null`)).toBe(4)
+  })
+})
+
+describe('group chat: mentions, unread counts, notifications (0009)', () => {
+  // Techiman Maize Growers: Kwame (leader), Esi (group account) and Ama are members; Efua is not
+  const g = `(select id from groups where name = 'Techiman Maize Growers')`
+  async function run(fn) {
+    let out
+    await db.transaction(async (tx) => {
+      const asUser = async (who) => { await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ sub: ids[who] })]); await tx.exec('set local role authenticated') }
+      const send = async (who, body, mentions = []) => { await asUser(who); return (await tx.query(`insert into messages (group_id, sender_id, body, mentions) values (${g}, auth.uid(), $1, $2) returning mentions`, [body, mentions])).rows[0] }
+      const unread = async (who) => { await asUser(who); return (await tx.query(`select unread from group_unread_counts() where group_id = ${g}`)).rows[0]?.unread ?? 0 }
+      const notes = async (who, type) => { await asUser(who); return (await tx.query(`select count(*)::int n from notifications where user_id = auth.uid() and type = $1 and read_at is null`, [type])).rows[0].n }
+      out = await fn({ tx, asUser, send, unread, notes })
+      await tx.rollback()
+    }).catch((e) => { out = { error: e.message } })
+    return out
+  }
+
+  it('unread count goes up with new messages and clears when the chat is opened', async () => {
+    const r = await run(async ({ tx, asUser, send, unread }) => {
+      // one transaction keeps now() fixed, so start the read marker just before it
+      await tx.exec('reset role'); await tx.query(`update group_members set last_read_at = now() - interval '1 microsecond' where group_id = ${g}`)
+      await send('kwame', 'First'); await send('kwame', 'Second')
+      const before = await unread('group')
+      const senderOwn = await unread('kwame')
+      await asUser('group'); await tx.query(`select mark_group_read(${g})`)
+      return { before, senderOwn, after: await unread('group') }
+    })
+    expect(r).toEqual({ before: 2, senderOwn: 0, after: 0 })
+  })
+
+  it('members get one new-messages notification until they open the chat', async () => {
+    const r = await run(async ({ tx, asUser, send, notes }) => {
+      await asUser('ama'); await tx.query(`select mark_group_read(${g})`)
+      await send('kwame', 'One'); await send('kwame', 'Two'); await send('kwame', 'Three')
+      return { ama: await notes('ama', 'group_message'), outsider: await notes('efua', 'group_message') }
+    })
+    expect(r).toEqual({ ama: 1, outsider: 0 })
+  })
+
+  it('@mentions notify the person mentioned; non-members are dropped', async () => {
+    const r = await run(async ({ send, notes }) => {
+      const m = await send('kwame', '@Esi Adjei can you bring the sprayer? @Efua Mensah', [ids.group, ids.efua])
+      return { kept: m.mentions, esi: await notes('group', 'mention'), efua: await notes('efua', 'mention') }
+    })
+    expect(r.kept).toEqual([ids.group])
+    expect(r.esi).toBe(1)
+    expect(r.efua).toBe(0)
+  })
+
+  it('members cannot make themselves leader', async () => {
+    await expect(as('group', `update group_members set member_role = 'leader' where user_id = auth.uid() returning member_role`)).resolves.toHaveLength(0)
   })
 })
 
