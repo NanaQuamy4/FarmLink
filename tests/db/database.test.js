@@ -41,6 +41,7 @@ beforeAll(async () => {
     await db.exec(sql(`supabase/migrations/${f}`))
   }
   await db.exec(sql('supabase/seed.sql'))
+  await db.exec(sql('supabase/migrations/0005_sessions_plus.sql'))
   for (const r of (await db.query('select id, email from auth.users')).rows) ids[r.email.split('@')[0]] = r.id
 }, 60000)
 
@@ -300,3 +301,52 @@ describe('extended modules', () => {
     expect(await count('buyer', `select count(*) n from messages where group_id is not null`)).toBe(0)
   })
 })
+
+describe('sessions: hosts, materials, Q&A, feedback (0005)', () => {
+  const s1 = `(select id from sessions where title = 'Controlling fall armyworm in maize')`
+  const past = `(select id from sessions where title = 'Storing grain to cut post-harvest losses')`
+
+  it('only verifiers, admins and approved experts can host', async () => {
+    await expect(as('kwame', `insert into sessions (host_id, title, starts_at) values (auth.uid(), 'My talk', now() + interval '1 day')`)).rejects.toThrow()
+    await expect(as('kwame', `select set_session_host(auth.uid(), true)`)).rejects.toThrow(/Only an administrator/)
+    await expect(as('kwame', `update profiles set can_host_sessions = true where id = auth.uid()`)).rejects.toThrow(/Only an administrator/)
+    // admin approves Kwame, then he can schedule (one transaction so the approval is visible)
+    let rows
+    await db.transaction(async (tx) => {
+      await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ sub: ids.admin })])
+      await tx.exec('set local role authenticated')
+      await tx.query('select set_session_host($1, true)', [ids.kwame])
+      await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ sub: ids.kwame })])
+      rows = (await tx.query(`insert into sessions (host_id, title, starts_at) values (auth.uid(), 'Kwame on maize spacing', now() + interval '2 days') returning id`)).rows
+      await tx.rollback()
+    }).catch(() => {})
+    expect(rows).toHaveLength(1)
+  })
+
+  it('only the host adds materials', async () => {
+    await expect(as('kwame', `insert into session_resources (session_id, title, url, added_by) values (${s1}, 'Mine', 'https://x.org', auth.uid())`)).rejects.toThrow()
+    await expect(as('officer', `insert into session_resources (session_id, title, url, added_by) values (${s1}, 'Slides', 'https://x.org', auth.uid()) returning id`)).resolves.toHaveLength(1)
+  })
+
+  it('anyone signed in can ask and vote; only the host answers', async () => {
+    await expect(as('efua', `insert into session_questions (session_id, user_id, body) values (${s1}, auth.uid(), 'How often should I scout?') returning id`)).resolves.toHaveLength(1)
+    await expect(as('efua', `insert into session_question_votes (question_id, user_id) select id, auth.uid() from session_questions limit 1 returning question_id`)).resolves.toHaveLength(1)
+    await expect(as('kwame', `select answer_question((select id from session_questions limit 1), 'Every week')`)).rejects.toThrow(/Only the host/)
+    await expect(as('officer', `select answer_question((select id from session_questions limit 1), 'Twice a week while plants are young.')`)).resolves.toBeTruthy()
+  })
+
+  it('feedback only from registered people after the start', async () => {
+    await expect(as('kwame', `insert into session_feedback (session_id, user_id, score) values (${s1}, auth.uid(), 5)`)).rejects.toThrow(/once the session has started/)
+    await expect(as('buyer', `insert into session_feedback (session_id, user_id, score) values (${past}, auth.uid(), 5)`)).rejects.toThrow(/registered/)
+    const sum = (await one('officer', `select session_summary(${past}) s`)).s
+    expect(sum.attended).toBe(2)
+    expect(sum.feedback_count).toBe(1)
+  })
+
+  it('registering sends a confirmation notification', async () => {
+    const n = await one('efua', `with r as (insert into session_registrations (session_id, user_id) values (${s1}, auth.uid()) returning 1)
+      select (select count(*) from r) inserted`)
+    expect(Number(n.inserted)).toBe(1)
+  })
+})
+

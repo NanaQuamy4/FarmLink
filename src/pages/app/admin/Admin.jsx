@@ -24,6 +24,12 @@ export function AdminUsers() {
     if (e) return setErr(errorMessage(e))
     setData(data.map((x) => (x.id === p.id ? { ...x, role: r } : x)))
   }
+  async function toggleHost(p) {
+    setErr('')
+    const { error: e } = await supabase.rpc('set_session_host', { p_user: p.id, p_allowed: !p.can_host_sessions })
+    if (e) return setErr(errorMessage(e))
+    setData(data.map((x) => (x.id === p.id ? { ...x, can_host_sessions: !p.can_host_sessions } : x)))
+  }
   async function suspend(p) {
     setErr('')
     const { error: e } = await supabase.rpc('set_user_suspended', { p_user: p.id, p_suspended: !p.is_suspended })
@@ -33,7 +39,7 @@ export function AdminUsers() {
 
   return (
     <div className="fl-page">
-      <PageHeader eyebrow="Admin" title="Users" text={`${data?.length ?? '…'} accounts. Make verifiers through the Verifiers page so their regions are set.`} />
+      <PageHeader eyebrow="Admin" title="Users" text={`${data?.length ?? '…'} accounts. Make verifiers through the Verifiers page so their regions are set. Switch on "Hosts sessions" for experts who should run education sessions.`} />
       <div className="fl-card p-3 mb-3 d-flex flex-wrap gap-2">
         <input className="form-control" style={{ maxWidth: 320 }} placeholder="Search name, group, region…" aria-label="Search users" value={q} onChange={(e) => setQ(e.target.value)} />
         <select className="form-select w-auto" aria-label="Filter by role" value={role} onChange={(e) => setRole(e.target.value)}>
@@ -44,7 +50,7 @@ export function AdminUsers() {
       {loading ? <Loading /> : (
         <div className="fl-card p-0 table-responsive">
           <table className="table align-middle mb-0">
-            <thead className="small text-muted-fl"><tr><th className="ps-3">User</th><th>Region</th><th>Joined</th><th>Role</th><th className="text-end pe-3">Account</th></tr></thead>
+            <thead className="small text-muted-fl"><tr><th className="ps-3">User</th><th>Region</th><th>Joined</th><th>Role</th><th title="Can schedule education sessions">Hosts sessions</th><th className="text-end pe-3">Account</th></tr></thead>
             <tbody>
               {rows.map((p) => (
                 <tr key={p.id} className={p.is_suspended ? 'opacity-50' : ''}>
@@ -55,6 +61,13 @@ export function AdminUsers() {
                     <select className="form-select form-select-sm w-auto" aria-label={`Role for ${displayName(p)}`} value={p.role} disabled={p.id === me.id} onChange={(e) => changeRole(p, e.target.value)}>
                       {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                     </select>
+                  </td>
+                  <td>
+                    {['verifier', 'admin'].includes(p.role) ? <span className="small text-muted-fl">Always</span> : (
+                      <div className="form-check form-switch mb-0">
+                        <input className="form-check-input" type="checkbox" role="switch" aria-label={`Let ${displayName(p)} host sessions`} checked={!!p.can_host_sessions} onChange={() => toggleHost(p)} />
+                      </div>
+                    )}
                   </td>
                   <td className="text-end pe-3">
                     {p.id !== me.id && <ActionButton className={`btn btn-sm ${p.is_suspended ? 'btn-outline-primary' : 'btn-outline-danger'}`} confirm={p.is_suspended ? null : `Suspend ${displayName(p)}?`} onClick={() => suspend(p)}>{p.is_suspended ? 'Reactivate' : 'Suspend'}</ActionButton>}
