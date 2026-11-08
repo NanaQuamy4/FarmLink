@@ -1,0 +1,7 @@
+node_modules
+dist
+.env
+.env.local
+*.log
+brand/logo-pack/*.zip
+.qodo

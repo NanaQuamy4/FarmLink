@@ -1,0 +1,252 @@
+// FarmLink design system
+// Palette from logo concept D (leaf link flat). Bootstrap is themed first,
+// then the FarmLink components below build on the same tokens.
+
+// ---------- Tokens ----------
+$fl-deep: #05402E;      // brand, dark sections, primary text-safe green
+$fl-deep-2: #0B5239;    // raised surface on dark sections
+$fl-deep-3: #032B1F;    // deepest shade, footer
+$fl-lime: #C8F06A;      // accent on dark, CTA fill (never as text on white)
+$fl-lime-2: #B6E24F;    // lime hover
+$fl-leaf: #8DBB55;      // secondary leaf on dark
+$fl-field: #5E9A3A;     // secondary leaf on light (large/graphic use only)
+$fl-ochre: #D08A2C;     // harvest accent, warnings
+$fl-ink: #13231B;       // body text
+$fl-muted: #5B6B61;     // secondary text
+$fl-ground: #F4F6EF;    // page background
+$fl-line: #E2E8DA;      // borders on light
+
+// ---------- Bootstrap overrides ----------
+$primary: $fl-deep;
+$secondary: $fl-muted;
+$success: #2F7D3B;
+$warning: $fl-ochre;
+$danger: #C2412D;
+$info: #2F6F8F;
+$light: $fl-ground;
+$dark: $fl-ink;
+
+$body-bg: $fl-ground;
+$body-color: $fl-ink;
+$border-color: $fl-line;
+$link-color: $fl-deep;
+$link-hover-color: $fl-deep-2;
+
+$font-family-sans-serif: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+$headings-font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+$headings-font-weight: 600;
+$headings-color: $fl-ink;
+$display-font-weight: 600;
+$font-size-base: 1rem;
+$line-height-base: 1.6;
+
+$border-radius: .75rem;
+$border-radius-sm: .5rem;
+$border-radius-lg: 1.25rem;
+$border-radius-xl: 1.75rem;
+$border-radius-xxl: 2rem;
+
+$btn-border-radius: 50rem;
+$btn-border-radius-sm: 50rem;
+$btn-border-radius-lg: 50rem;
+$btn-padding-y: .65rem;
+$btn-padding-x: 1.35rem;
+$btn-font-weight: 600;
+$input-btn-focus-color: rgba($fl-lime, .55);
+$input-border-color: $fl-line;
+$input-padding-y: .65rem;
+$input-padding-x: 1rem;
+$input-focus-border-color: $fl-field;
+
+$card-border-color: $fl-line;
+$card-border-radius: $border-radius-lg;
+$card-spacer-y: 1.5rem;
+$card-spacer-x: 1.5rem;
+
+$navbar-padding-y: 1rem;
+$box-shadow-sm: 0 1px 2px rgba($fl-deep, .06);
+$box-shadow: 0 10px 30px -12px rgba($fl-deep, .18);
+$box-shadow-lg: 0 24px 60px -20px rgba($fl-deep, .28);
+
+$container-max-widths: (sm: 540px, md: 720px, lg: 960px, xl: 1140px, xxl: 1240px);
+
+@import 'bootstrap/scss/bootstrap';
+
+// ---------- CSS variables for components ----------
+:root {
+  --fl-deep: #{$fl-deep};
+  --fl-deep-2: #{$fl-deep-2};
+  --fl-deep-3: #{$fl-deep-3};
+  --fl-lime: #{$fl-lime};
+  --fl-leaf: #{$fl-leaf};
+  --fl-field: #{$fl-field};
+  --fl-ochre: #{$fl-ochre};
+  --fl-ink: #{$fl-ink};
+  --fl-muted: #{$fl-muted};
+  --fl-ground: #{$fl-ground};
+  --fl-line: #{$fl-line};
+  --fl-radius: 1.25rem;
+  --fl-radius-xl: 2rem;
+  --fl-section-y: clamp(4rem, 8vw, 7rem);
+}
+
+// ---------- Type ----------
+h1, h2, h3, .display-1, .display-2, .display-3, .display-4, .display-5 { letter-spacing: -0.025em; }
+.fl-h-hero { font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.04; letter-spacing: -0.035em; }
+.fl-h-section { font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; }
+.fl-serif { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+.fl-lead { font-size: 1.125rem; color: var(--fl-muted); }
+.text-muted-fl { color: var(--fl-muted) !important; }
+
+// Small label above section headings
+.fl-eyebrow {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .8125rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--fl-deep);
+  &::before { content: ''; width: .5rem; height: .5rem; border-radius: 50%; background: var(--fl-field); }
+}
+.fl-on-dark .fl-eyebrow { color: var(--fl-lime); &::before { background: var(--fl-lime); } }
+
+// ---------- Buttons ----------
+.btn-lime {
+  --bs-btn-color: #{$fl-deep};
+  --bs-btn-bg: #{$fl-lime};
+  --bs-btn-border-color: #{$fl-lime};
+  --bs-btn-hover-color: #{$fl-deep};
+  --bs-btn-hover-bg: #{$fl-lime-2};
+  --bs-btn-hover-border-color: #{$fl-lime-2};
+  --bs-btn-active-color: #{$fl-deep};
+  --bs-btn-active-bg: #{$fl-lime-2};
+  --bs-btn-active-border-color: #{$fl-lime-2};
+  --bs-btn-disabled-color: #{$fl-deep};
+  --bs-btn-disabled-bg: #{$fl-lime};
+}
+.btn-outline-light-fl {
+  --bs-btn-color: #fff;
+  --bs-btn-border-color: rgba(255, 255, 255, .45);
+  --bs-btn-hover-color: #{$fl-deep};
+  --bs-btn-hover-bg: #fff;
+  --bs-btn-hover-border-color: #fff;
+  --bs-btn-active-color: #{$fl-deep};
+  --bs-btn-active-bg: #fff;
+}
+// Pill button with a round arrow chip at the end
+.btn-arrow {
+  display: inline-flex; align-items: center; gap: .75rem; padding-right: .4rem;
+  .fl-arrow {
+    display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%;
+    background: var(--fl-deep); color: var(--fl-lime); transition: transform .2s ease;
+  }
+  &.btn-primary .fl-arrow { background: var(--fl-lime); color: var(--fl-deep); }
+  &:hover .fl-arrow { transform: rotate(-45deg); }
+}
+.btn { transition: background-color .15s ease, color .15s ease, border-color .15s ease, transform .15s ease; }
+.btn:active { transform: translateY(1px); }
+
+// ---------- Sections ----------
+.fl-section { padding-block: var(--fl-section-y); }
+.fl-section-dark {
+  background: var(--fl-deep); color: rgba(255, 255, 255, .78);
+  h1, h2, h3, h4, h5 { color: #fff; }
+}
+.fl-on-dark .text-muted-fl { color: rgba(255, 255, 255, .65) !important; }
+.fl-rounded-band { border-radius: var(--fl-radius-xl); margin-inline: clamp(.5rem, 1.5vw, 1rem); }
+
+// ---------- Cards ----------
+.fl-card {
+  background: #fff; border: 1px solid var(--fl-line); border-radius: var(--fl-radius);
+  padding: 1.5rem; height: 100%;
+}
+.fl-card-dark {
+  background: var(--fl-deep-2); border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: var(--fl-radius); padding: 1.5rem; height: 100%;
+}
+.fl-icon-tile {
+  display: inline-grid; place-items: center; flex: none;
+  width: 3rem; height: 3rem; border-radius: .9rem; font-size: 1.35rem;
+  background: var(--fl-lime); color: var(--fl-deep);
+  &.soft { background: #E8F3D2; }
+}
+
+// Photo card with text on a bottom gradient
+.fl-img-card {
+  position: relative; display: block; overflow: hidden; border-radius: var(--fl-radius-xl);
+  min-height: 22rem; color: #fff; text-decoration: none; isolation: isolate;
+  img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform .6s ease; }
+  &::after { content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(3, 43, 31, 0) 35%, rgba(3, 43, 31, .88) 100%); }
+  &:hover img { transform: scale(1.04); }
+  .fl-img-card-body { position: absolute; inset: auto 0 0 0; padding: 1.75rem; }
+  h3 { color: #fff; }
+}
+
+// Frosted info card that floats over photos
+.fl-glass {
+  background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .28);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-radius: var(--fl-radius); color: #fff; padding: 1rem 1.25rem;
+}
+.fl-float { background: #fff; border-radius: var(--fl-radius); box-shadow: $box-shadow-lg; padding: 1rem 1.25rem; color: var(--fl-ink); }
+
+// Small pill tag
+.fl-pill {
+  display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .8rem; border-radius: 50rem;
+  font-size: .8125rem; font-weight: 500; background: #fff; border: 1px solid var(--fl-line); color: var(--fl-ink);
+  &.lime { background: var(--fl-lime); border-color: var(--fl-lime); color: var(--fl-deep); }
+  &.dark { background: var(--fl-deep-2); border-color: rgba(255, 255, 255, .12); color: #fff; }
+}
+
+// Status badges used across the app
+.fl-status { display: inline-flex; align-items: center; gap: .35rem; padding: .2rem .65rem; border-radius: 50rem; font-size: .75rem; font-weight: 600;
+  &::before { content: ''; width: .45rem; height: .45rem; border-radius: 50%; background: currentColor; }
+  &.verified { background: #E3F2D9; color: #2F6B1F; }
+  &.pending { background: #FBEBD3; color: #8A5310; }
+  &.rejected { background: #F8E0DB; color: #9A2E1E; }
+  &.neutral { background: #ECEFE8; color: var(--fl-muted); }
+}
+
+// Big statistic
+.fl-stat { font-family: $headings-font-family; font-weight: 600; font-size: clamp(2.25rem, 4vw, 3.25rem); line-height: 1; letter-spacing: -0.03em; color: var(--fl-ink); }
+.fl-on-dark .fl-stat { color: #fff; }
+
+// ---------- Navbar ----------
+.fl-brand { display: inline-flex; align-items: center; gap: .6rem; text-decoration: none;
+  img { width: 2.25rem; height: 2.25rem; }
+  .fl-brand-name { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 1.4rem; letter-spacing: -0.02em; color: var(--fl-deep);
+    span { color: var(--fl-field); } }
+  &.reverse .fl-brand-name { color: #fff; span { color: var(--fl-lime); } }
+}
+.fl-nav-links .nav-link { font-weight: 500; color: inherit; opacity: .85; padding-inline: .9rem !important;
+  &:hover, &.active { opacity: 1; } }
+.fl-nav-pill { background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .18); border-radius: 50rem; padding: .25rem; backdrop-filter: blur(10px); }
+
+// ---------- Forms ----------
+.form-control, .form-select { background-color: #fff; }
+.form-label { font-weight: 500; font-size: .9rem; }
+.form-range::-webkit-slider-thumb { background: var(--fl-deep); }
+.form-range::-moz-range-thumb { background: var(--fl-deep); }
+
+// ---------- Accordion (FAQ) ----------
+.fl-faq .accordion-item { border: 1px solid var(--fl-line); border-radius: var(--fl-radius) !important; margin-bottom: .75rem; overflow: hidden; }
+.fl-faq .accordion-button { font-family: $headings-font-family; font-weight: 600; font-size: 1.05rem; box-shadow: none; }
+.fl-faq .accordion-button:not(.collapsed) { background: #fff; color: var(--fl-deep); }
+
+// ---------- Utilities ----------
+.fl-cover { object-fit: cover; width: 100%; height: 100%; }
+.rounded-fl { border-radius: var(--fl-radius) !important; }
+.rounded-fl-xl { border-radius: var(--fl-radius-xl) !important; }
+.bg-lime { background: var(--fl-lime) !important; }
+.bg-deep { background: var(--fl-deep) !important; }
+.text-lime { color: var(--fl-lime) !important; }
+.text-deep { color: var(--fl-deep) !important; }
+.text-ochre { color: var(--fl-ochre) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+// Hero photo shade: darker and top-to-bottom on phones so text stays readable
+.fl-hero-shade { background: linear-gradient(180deg, rgba(3, 43, 31, .78) 0%, rgba(3, 43, 31, .88) 100%); }
+@include media-breakpoint-up(lg) {
+  .fl-hero-shade { background: linear-gradient(100deg, rgba(3, 43, 31, .92) 0%, rgba(3, 43, 31, .7) 45%, rgba(3, 43, 31, .15) 100%); }
+}
