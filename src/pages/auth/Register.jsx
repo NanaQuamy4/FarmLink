@@ -67,9 +67,9 @@ export default function Register() {
             {ROLES.map((r) => (
               <div className="col-4" key={r.key}>
                 <input type="radio" className="btn-check" name="role" id={`role-${r.key}`} checked={role === r.key} onChange={() => setRole(r.key)} />
-                <label className="btn btn-outline-primary w-100 h-100 d-grid gap-1 py-3 rounded-4" htmlFor={`role-${r.key}`} style={{ borderRadius: '1rem' }}>
+                <label className="btn btn-outline-primary w-100 h-100 d-grid gap-1 py-3 px-1 fl-role-option" htmlFor={`role-${r.key}`}>
                   <i className={`bi ${r.icon} fs-4`} />
-                  <span className="fw-semibold">{r.title}</span>
+                  <span className="fw-semibold fl-role-title">{r.title}</span>
                   <span className="small fw-normal d-none d-sm-block" style={{ opacity: 0.8 }}>{r.text}</span>
                 </label>
               </div>

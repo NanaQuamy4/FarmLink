@@ -3,8 +3,8 @@ import Brand from '../../components/Brand'
 // Split screen for login and registration: photo panel on large screens, form on the right.
 export default function AuthLayout({ title, subtitle, children, image = '/images/auth-green-field.jpg', quote }) {
   return (
-    <div className="min-vh-100 d-flex p-2 p-md-3 gap-3">
-      <aside className="d-none d-lg-flex position-relative overflow-hidden rounded-fl-xl flex-column justify-content-between p-5 text-white" style={{ flex: '0 0 44%', isolation: 'isolate' }}>
+    <div className="min-vh-100 d-flex align-items-start p-2 p-md-3 gap-3">
+      <aside className="d-none d-lg-flex position-relative overflow-hidden rounded-fl-xl flex-column justify-content-between p-5 text-white" style={{ flex: '0 0 44%', isolation: 'isolate', position: 'sticky', top: '1rem', height: 'calc(100vh - 2rem)', alignSelf: 'flex-start' }}>
         <img src={image} alt="" className="position-absolute top-0 start-0 fl-cover" style={{ zIndex: -2 }} />
         <div className="position-absolute top-0 start-0 w-100 h-100" style={{ zIndex: -1, background: 'linear-gradient(180deg, rgba(3,43,31,.55), rgba(3,43,31,.2) 40%, rgba(3,43,31,.85))' }} />
         <Brand reverse />
@@ -15,7 +15,7 @@ export default function AuthLayout({ title, subtitle, children, image = '/images
           <p className="text-white-50 mb-0">Every plot verified. Every term recorded. Every harvest shared as agreed.</p>
         </div>
       </aside>
-      <main className="flex-grow-1 d-flex flex-column">
+      <main className="flex-grow-1 d-flex flex-column min-vh-100">
         <div className="d-lg-none p-3"><Brand /></div>
         <div className="flex-grow-1 d-flex align-items-center justify-content-center py-4 px-3">
           <div className="w-100 fl-enter" style={{ maxWidth: 460 }}>

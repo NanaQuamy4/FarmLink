@@ -490,3 +490,6 @@ $fl-ease: cubic-bezier(.2, .7, .2, 1);
   .fl-app, .fl-content { display: block; padding: 0; background: #fff; }
   .fl-card { border: 1px solid #ccc; break-inside: avoid; }
 }
+// Role picker on the register page
+.fl-role-option { border-radius: 1rem !important; }
+.fl-role-title { font-size: clamp(.78rem, 3.4vw, 1rem); overflow-wrap: anywhere; }
