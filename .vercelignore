@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+.qodo
+brand/photos-incoming
+brand/logo-pack
+tests
+supabase
+*.log
