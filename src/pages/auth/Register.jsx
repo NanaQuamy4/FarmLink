@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthLayout from './AuthLayout'
 import { supabase, errorMessage } from '../../lib/supabase'
 import { REGIONS } from '../../lib/constants'
+import { passwordProblem, PASSWORD_HINT } from '../../lib/format'
 
 const ROLES = [
   { key: 'landowner', icon: 'bi-house-door', title: 'Landowner', text: 'I have land to list' },
@@ -23,7 +24,7 @@ export default function Register() {
   async function submit(e) {
     e.preventDefault()
     setError('')
-    if (form.password.length < 8) return setError('Use at least 8 characters for your password.')
+    if (passwordProblem(form.password)) return setError(passwordProblem(form.password))
     if (form.phone && !/^\+?[0-9 ]{9,16}$/.test(form.phone)) return setError('Enter a phone number like 024 123 4567.')
     if (role === 'farmer' && form.is_group && (!form.group_name || Number(form.group_size) < 2)) return setError('Add your group name and how many members it has (2 or more).')
     setBusy(true)
@@ -108,7 +109,7 @@ export default function Register() {
         <div>
           <label className="form-label" htmlFor="reg-password">Password</label>
           <input id="reg-password" type="password" className="form-control" autoComplete="new-password" required minLength={8} value={form.password} onChange={set('password')} />
-          <div className="form-text">At least 8 characters.</div>
+          <div className="form-text">{PASSWORD_HINT}</div>
         </div>
         <button type="submit" className="btn btn-primary btn-lg" disabled={busy || !form.full_name || !form.email || !form.password}>
           {busy && <span className="spinner-border spinner-border-sm me-2" aria-hidden="true" />}Create account

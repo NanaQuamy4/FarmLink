@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from './AuthLayout'
 import { supabase, errorMessage } from '../../lib/supabase'
+import { passwordProblem, PASSWORD_HINT } from '../../lib/format'
 
 export function ForgotPassword() {
   const [email, setEmail] = useState('')
@@ -38,7 +39,7 @@ export function ResetPassword() {
 
   async function submit(e) {
     e.preventDefault()
-    if (password.length < 8) return setError('Use at least 8 characters.')
+    if (passwordProblem(password)) return setError(passwordProblem(password))
     setBusy(true)
     const { error: err } = await supabase.auth.updateUser({ password })
     setBusy(false)
@@ -50,7 +51,7 @@ export function ResetPassword() {
     <AuthLayout title="Choose a new password">
       <form onSubmit={submit} className="d-grid gap-3">
         {error && <div className="alert alert-danger py-2 mb-0">{error}</div>}
-        <div><label className="form-label" htmlFor="np">New password</label><input id="np" type="password" className="form-control" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+        <div><label className="form-label" htmlFor="np">New password</label><input id="np" type="password" className="form-control" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /><div className="form-text">{PASSWORD_HINT}</div></div>
         <button className="btn btn-primary btn-lg" disabled={busy}>Save password</button>
       </form>
     </AuthLayout>

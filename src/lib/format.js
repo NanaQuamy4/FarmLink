@@ -27,6 +27,11 @@ export const initials = (name = '') =>
 
 export const displayName = (p) => (p ? (p.is_group && p.group_name ? p.group_name : p.full_name) : '')
 
+// Matches the Supabase Auth password rules: 8+ characters with lowercase, uppercase and a digit
+export const PASSWORD_HINT = 'At least 8 characters, with uppercase and lowercase letters and a number.'
+export const passwordProblem = (pw) =>
+  (pw.length < 8 || !/[a-z]/.test(pw) || !/[A-Z]/.test(pw) || !/[0-9]/.test(pw) ? `Password needs ${PASSWORD_HINT.charAt(0).toLowerCase()}${PASSWORD_HINT.slice(1)}` : null)
+
 // Links from the database are only followed when they are plain web links or site paths
 export const safeWebUrl = (u) => (typeof u === 'string' && /^https?:\/\//i.test(u.trim()) ? u.trim() : null)
 export const safeAppPath = (p) => (typeof p === 'string' && /^\/(?!\/)/.test(p) && !p.includes('\\') ? p : null)
