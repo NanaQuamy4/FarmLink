@@ -13,7 +13,7 @@ export const coverPhoto = (plot) =>
 export function PlotCard({ plot, to, showStatus = true, height = 300 }) {
   return (
     <Link to={to} className="fl-img-card fl-photo-card" style={{ minHeight: height }}>
-      <Photo path={coverPhoto(plot)} bucket="plot-photos" alt="" className="fl-photo-fill" />
+      <Photo path={coverPhoto(plot)} bucket="plot-photos" alt="" className="fl-photo-fill" size="sm" />
       {showStatus && <span className="position-absolute top-0 start-0 m-3"><StatusBadge map={PLOT_STATUS} value={plot.status} /></span>}
       <span className="fl-card-arrow" aria-hidden="true"><i className="bi bi-arrow-up-right" /></span>
       <div className="fl-img-card-body pe-5">
@@ -57,7 +57,7 @@ export function DealCard({ deal, me }) {
   return (
     <Link to={`/deals/${deal.id}`} className="fl-deal-card fl-lift">
       <div className="fl-deal-card-img">
-        <Photo path={coverPhoto(deal.plots)} bucket="plot-photos" alt="" className="fl-cover" />
+        <Photo path={coverPhoto(deal.plots)} bucket="plot-photos" alt="" className="fl-cover" size="sm" />
         <span className="position-absolute top-0 start-0 m-2"><StatusBadge map={DEAL_STATUS} value={deal.status} /></span>
       </div>
       <div className="p-3 flex-grow-1 d-flex flex-column">
@@ -81,4 +81,4 @@ export function DealCard({ deal, me }) {
 export const DEAL_SELECT = `*, plots(title, region, district, plot_photos(storage_path, sort_order, is_document)),
   landowner:profiles!deals_landowner_id_fkey(id, full_name, is_group, group_name, avatar_url),
   farmer:profiles!deals_farmer_id_fkey(id, full_name, is_group, group_name, avatar_url),
-  season_milestones(milestone)`
+  season_milestones(milestone), agreements(deal_id, version, landowner_confirmed_at, farmer_confirmed_at)`

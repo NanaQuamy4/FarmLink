@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import Brand from '../components/Brand'
 import { Avatar } from '../components/ui'
@@ -88,7 +88,7 @@ export default function UserLayout() {
       {profile?.is_suspended && <div className="alert alert-warning mx-3">Your account is suspended. Contact the FarmLink administrator.</div>}
 
       <main className="fl-user-main">
-        <Outlet />
+        <Suspense fallback={<div className="d-grid" style={{ minHeight: '40vh', placeItems: 'center' }}><span className="spinner-border text-success" role="status" /></div>}><Outlet /></Suspense>
       </main>
 
       <nav className="fl-bottombar d-lg-none" aria-label="Quick">

@@ -16,7 +16,7 @@ export default function Deals() {
 
   return (
     <div className="fl-page">
-      <PageHeader image={['landowner', 'farmer'].includes(role) ? '/images/crop-rows-sunset.jpg' : undefined} eyebrow={['landowner', 'farmer'].includes(role) ? 'Deals' : undefined} title={role === 'verifier' ? 'Assigned deals' : ['landowner', 'farmer'].includes(role) ? 'Every season,' : 'Deals'} accent={['landowner', 'farmer'].includes(role) ? 'agreed and recorded.' : undefined}
+      <PageHeader image={['landowner', 'farmer'].includes(role) ? '/images/crop-rows-sunset.webp' : undefined} eyebrow={['landowner', 'farmer'].includes(role) ? 'Deals' : undefined} title={role === 'verifier' ? 'Assigned deals' : ['landowner', 'farmer'].includes(role) ? 'Every season,' : 'Deals'} accent={['landowner', 'farmer'].includes(role) ? 'agreed and recorded.' : undefined}
         text={role === 'verifier' ? 'Deals on plots you verified. You can read them to mediate disputes.' : role === 'admin' ? 'All deals on the platform.' : 'Each deal records the agreement, season and harvest split.'} />
       <div className="d-flex gap-2 mb-4">
         {Object.keys(GROUPS).map((k) => (

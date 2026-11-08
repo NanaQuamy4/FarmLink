@@ -60,7 +60,7 @@ export function Marketplace() {
 
   return (
     <div className="fl-page">
-      <PageHeader image="/images/hero-tomato-harvest.jpg" eyebrow="Marketplace" title={canSell ? 'Sell your harvest,' : 'Fresh produce,'} accent={canSell ? 'build your name.' : 'straight from farmers.'} text="Buyers send offers. Sellers accept or decline. Payment happens outside FarmLink."
+      <PageHeader image="/images/hero-tomato-harvest.webp" eyebrow="Marketplace" title={canSell ? 'Sell your harvest,' : 'Fresh produce,'} accent={canSell ? 'build your name.' : 'straight from farmers.'} text="Buyers send offers. Sellers accept or decline. Payment happens outside FarmLink."
         actions={canSell && <button type="button" className="btn btn-primary" onClick={() => setCreating(!creating)}><i className="bi bi-plus-lg me-1" />List produce</button>} />
       {creating && <ListingForm profile={profile} onDone={() => { setCreating(false); setMine(true); reload() }} />}
       <div className="d-flex flex-wrap gap-2 align-items-center mb-4">
@@ -76,7 +76,7 @@ export function Marketplace() {
           {rows.map((l) => (
             <div className="col-sm-6 col-xl-4" key={l.id}>
               <Link to={`/market/listings/${l.id}`} className="fl-img-card fl-photo-card">
-                <Photo path={l.photo_path} bucket="produce-photos" className="fl-photo-fill" />
+                <Photo path={l.photo_path} bucket="produce-photos" className="fl-photo-fill" size="sm" />
                 {l.status !== 'open' && <span className="position-absolute top-0 start-0 m-3 fl-status neutral">{l.status === 'sold' ? 'Sold' : 'Closed'}</span>}
                 <span className="fl-card-arrow" aria-hidden="true"><i className="bi bi-arrow-up-right" /></span>
                 <div className="fl-img-card-body pe-5">
@@ -203,7 +203,7 @@ export function MyOffers() {
   }
   return (
     <div className="fl-page">
-      <PageHeader image="/images/market-tomatoes.jpg" eyebrow="My offers" title="Your offers," accent="at a glance." actions={<Link to="/market" className="btn btn-primary">Browse produce</Link>} />
+      <PageHeader image="/images/market-tomatoes.webp" eyebrow="My offers" title="Your offers," accent="at a glance." actions={<Link to="/market" className="btn btn-primary">Browse produce</Link>} />
       <ErrorAlert error={error} onRetry={reload} />
       {loading ? <Loading /> : !data?.length ? <div className="fl-card"><EmptyState icon="bi-tags" title="No offers yet" /></div> : (
         <div className="fl-card p-2">

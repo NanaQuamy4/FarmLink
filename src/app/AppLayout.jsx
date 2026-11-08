@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import Brand from '../components/Brand'
 import { Avatar } from '../components/ui'
@@ -101,7 +101,7 @@ export default function AppLayout() {
         )}
 
         <main className="fl-content">
-          <Outlet />
+          <Suspense fallback={<div className="d-grid" style={{ minHeight: '40vh', placeItems: 'center' }}><span className="spinner-border text-success" role="status" /></div>}><Outlet /></Suspense>
         </main>
       </div>
 

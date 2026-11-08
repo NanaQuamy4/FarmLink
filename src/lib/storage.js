@@ -17,7 +17,7 @@ export async function photoUrl(path, bucket = 'plot-photos') {
 }
 
 // Shrinks a photo in the browser before upload (slow connections, free-tier storage).
-export async function compressImage(file, maxSide = 1600, quality = 0.78) {
+export async function compressImage(file, maxSide = 1400, quality = 0.72) {
   if (!file.type.startsWith('image/') || file.type === 'image/gif') return file
   const bitmap = await createImageBitmap(file)
   const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height))

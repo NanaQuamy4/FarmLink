@@ -133,7 +133,7 @@ export function HelpCenter() {
 
   return (
     <div className="fl-page">
-      <PageHeader image="/images/farmer-basket.jpg" imagePosition="center 30%" eyebrow="Help & support" title="How can we" accent="help you?"
+      <PageHeader image="/images/farmer-basket.webp" imagePosition="center 30%" eyebrow="Help & support" title="How can we" accent="help you?"
         text="Quick answers to common questions, or write to the FarmLink team."
         actions={<a href="#contact" className="btn btn-primary btn-lg"><i className="bi bi-chat-dots me-1" />Contact support</a>} />
       <div className="row g-4">

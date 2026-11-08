@@ -48,12 +48,11 @@ const Section = ({ title, link, linkLabel = 'See all', children }) => (
 
 // Which deals are waiting on this person, and for what
 async function dealTodos(deals, me) {
-  const drafting = deals.filter((d) => d.status === 'drafting').map((d) => d.id)
-  const { data: ags } = drafting.length
-    ? await supabase.from('agreements').select('deal_id, version, landowner_confirmed_at, farmer_confirmed_at').in('deal_id', drafting).order('version', { ascending: false })
-    : { data: [] }
   const latest = {}
-  for (const a of ags || []) latest[a.deal_id] ||= a
+  for (const d of deals) {
+    const top = [...(d.agreements || [])].sort((a, b) => b.version - a.version)[0]
+    if (top) latest[d.id] = top
+  }
   const todos = []
   for (const d of deals) {
     const mine = d.landowner_id === me ? 'landowner_confirmed_at' : 'farmer_confirmed_at'
@@ -94,7 +93,7 @@ export function LandownerHome({ profile }) {
 
   return (
     <div className="fl-page">
-      <PageHeader image="/images/hero-pineapple-farm.jpg" tall eyebrow={today()} title={`${greeting()}, ${profile.full_name.split(' ')[0]}.`} accent="Your land is working."
+      <PageHeader image="/images/hero-pineapple-farm.webp" tall eyebrow={today()} title={`${greeting()}, ${profile.full_name.split(' ')[0]}.`} accent="Your land is working."
         text="Plots, applicants and seasons in one place. Every term you agree is on record."
         actions={<><Link to="/plots/new" className="btn btn-lime btn-lg btn-arrow">List a plot <span className="fl-arrow"><i className="bi bi-plus-lg" /></span></Link></>}
         stats={data && [
@@ -145,7 +144,7 @@ export function FarmerHome({ profile }) {
 
   return (
     <div className="fl-page">
-      <PageHeader image="/images/hero-farmer-maize.jpg" imagePosition="center 12%" tall eyebrow={today()} title={`${greeting()}, ${name}.`} accent="Let’s grow something."
+      <PageHeader image="/images/hero-farmer-maize.webp" imagePosition="center 12%" tall eyebrow={today()} title={`${greeting()}, ${name}.`} accent="Let’s grow something."
         text={profile.is_group ? `Farming together as a group of ${profile.group_size}.` : 'Find verified land, agree clear terms, and keep your season on record.'}
         actions={<Link to="/find" className="btn btn-lime btn-lg btn-arrow">Find land <span className="fl-arrow"><i className="bi bi-search" /></span></Link>}
         stats={data && [
@@ -191,7 +190,7 @@ export function FarmerHome({ profile }) {
             <div className="col-lg-5">
               <Section title="Your groups" link="/groups">
                 <Link to="/groups" className="fl-img-card" style={{ minHeight: 230 }}>
-                  <img src="/images/farmers-weeding.jpg" alt="" />
+                  <img src="/images/sm/farmers-weeding.webp" alt="" loading="lazy" />
                   <span className="fl-card-arrow" aria-hidden="true"><i className="bi bi-arrow-up-right" /></span>
                   <div className="fl-img-card-body pe-5">
                     {data.groups.length ? (
@@ -236,7 +235,7 @@ export function BuyerHome({ profile }) {
 
   return (
     <div className="fl-page">
-      <PageHeader image="/images/market-okro-seller.jpg" tall eyebrow={today()} title={`${greeting()}, ${profile.full_name.split(' ')[0]}.`} accent="Fresh from the farm."
+      <PageHeader image="/images/market-okro-seller.webp" tall eyebrow={today()} title={`${greeting()}, ${profile.full_name.split(' ')[0]}.`} accent="Fresh from the farm."
         text="Buy directly from FarmLink farmers and groups. Payment and collection happen between you and the seller."
         actions={<Link to="/market" className="btn btn-lime btn-lg btn-arrow">Browse produce <span className="fl-arrow"><i className="bi bi-basket" /></span></Link>}
         stats={data && [
@@ -252,7 +251,7 @@ export function BuyerHome({ profile }) {
               {data.listings.map((l) => (
                 <div className="col-sm-6 col-xl-4" key={l.id}>
                   <Link to={`/market/listings/${l.id}`} className="fl-img-card fl-photo-card">
-                    <Photo path={l.photo_path} bucket="produce-photos" className="fl-photo-fill" />
+                    <Photo path={l.photo_path} bucket="produce-photos" className="fl-photo-fill" size="sm" />
                     <span className="fl-card-arrow" aria-hidden="true"><i className="bi bi-arrow-up-right" /></span>
                     <div className="fl-img-card-body pe-5">
                       <span className="fl-pill lime mb-2">{l.price_per_unit != null ? `${fmtCedis(l.price_per_unit)} / ${l.unit.replace(/s$/, '')}` : 'Open to offers'}</span>

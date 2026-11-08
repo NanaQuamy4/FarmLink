@@ -1,7 +1,7 @@
 import Brand from '../../components/Brand'
 
 // Split screen for login and registration: photo panel on large screens, form on the right.
-export default function AuthLayout({ title, subtitle, children, image = '/images/auth-green-field.jpg', quote }) {
+export default function AuthLayout({ title, subtitle, children, image = '/images/auth-green-field.webp', quote }) {
   return (
     <div className="min-vh-100 d-flex align-items-start p-2 p-md-3 gap-3">
       <aside className="d-none d-lg-flex position-relative overflow-hidden rounded-fl-xl flex-column justify-content-between p-5 text-white" style={{ flex: '0 0 44%', isolation: 'isolate', position: 'sticky', top: '1rem', height: 'calc(100vh - 2rem)', alignSelf: 'flex-start' }}>

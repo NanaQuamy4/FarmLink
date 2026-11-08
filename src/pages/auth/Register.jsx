@@ -58,7 +58,7 @@ export default function Register() {
   }
 
   return (
-    <AuthLayout title="Create your account" subtitle="Free for landowners, farmers and buyers." image="/images/auth-tea-garden.jpg">
+    <AuthLayout title="Create your account" subtitle="Free for landowners, farmers and buyers." image="/images/auth-tea-garden.webp">
       <form onSubmit={submit} className="d-grid gap-3" noValidate>
         {error && <div className="alert alert-danger py-2 mb-0" role="alert">{error}</div>}
         <fieldset>

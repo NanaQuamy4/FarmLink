@@ -1,36 +1,58 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 import Landing from './pages/Landing'
-import Credits from './pages/Credits'
-import Setup from './pages/Setup'
 import SiteNav from './components/SiteNav'
-import Login from './pages/auth/Login'
-import Register from './pages/auth/Register'
-import { ForgotPassword, ResetPassword } from './pages/auth/PasswordReset'
 import AppLayout from './app/AppLayout'
 import UserLayout from './app/UserLayout'
 import { useAuth } from './lib/auth'
 import { RequireAuth, RequireRole, GuestOnly } from './app/guards'
-import Dashboard from './pages/app/Dashboard'
-import Notifications from './pages/app/Notifications'
-import Profile from './pages/app/Profile'
-import MyPlots from './pages/app/plots/MyPlots'
-import PlotForm from './pages/app/plots/PlotForm'
-import PlotDetail from './pages/app/plots/PlotDetail'
-import FindLand from './pages/app/plots/FindLand'
-import VerifyQueue from './pages/app/verify/VerifyQueue'
-import VerifyPlot from './pages/app/verify/VerifyPlot'
-import Applications from './pages/app/deals/Applications'
-import ApplicationDetail from './pages/app/deals/ApplicationDetail'
-import Messages from './pages/app/deals/Messages'
-import Deals from './pages/app/deals/Deals'
-import DealDetail from './pages/app/deals/DealDetail'
-import { DisputeList, DisputeMediation } from './pages/app/verify/Disputes'
-import { AdminUsers, AdminVerifiers, AdminPlots, AdminReports } from './pages/app/admin/Admin'
-import { GroupList, GroupDetail } from './pages/app/community/Groups'
-import { SessionList, SessionDetail } from './pages/app/community/Sessions'
-import { Marketplace, ListingDetail, MyOffers } from './pages/app/community/Market'
-import PublicProfile from './pages/app/community/PublicProfile'
-import { HelpCenter, TicketPage, AdminSupport } from './pages/app/Support'
+
+// Every page except the landing page loads on demand, so the first visit downloads less.
+const Credits = lazy(() => import('./pages/Credits'))
+const Setup = lazy(() => import('./pages/Setup'))
+const Login = lazy(() => import('./pages/auth/Login'))
+const Register = lazy(() => import('./pages/auth/Register'))
+const ForgotPassword = lazy(() => import('./pages/auth/PasswordReset').then((m) => ({ default: m.ForgotPassword })))
+const ResetPassword = lazy(() => import('./pages/auth/PasswordReset').then((m) => ({ default: m.ResetPassword })))
+const Dashboard = lazy(() => import('./pages/app/Dashboard'))
+const Notifications = lazy(() => import('./pages/app/Notifications'))
+const Profile = lazy(() => import('./pages/app/Profile'))
+const MyPlots = lazy(() => import('./pages/app/plots/MyPlots'))
+const PlotForm = lazy(() => import('./pages/app/plots/PlotForm'))
+const PlotDetail = lazy(() => import('./pages/app/plots/PlotDetail'))
+const FindLand = lazy(() => import('./pages/app/plots/FindLand'))
+const VerifyQueue = lazy(() => import('./pages/app/verify/VerifyQueue'))
+const VerifyPlot = lazy(() => import('./pages/app/verify/VerifyPlot'))
+const Applications = lazy(() => import('./pages/app/deals/Applications'))
+const ApplicationDetail = lazy(() => import('./pages/app/deals/ApplicationDetail'))
+const Messages = lazy(() => import('./pages/app/deals/Messages'))
+const Deals = lazy(() => import('./pages/app/deals/Deals'))
+const DealDetail = lazy(() => import('./pages/app/deals/DealDetail'))
+const DisputeList = lazy(() => import('./pages/app/verify/Disputes').then((m) => ({ default: m.DisputeList })))
+const DisputeMediation = lazy(() => import('./pages/app/verify/Disputes').then((m) => ({ default: m.DisputeMediation })))
+const AdminUsers = lazy(() => import('./pages/app/admin/Admin').then((m) => ({ default: m.AdminUsers })))
+const AdminVerifiers = lazy(() => import('./pages/app/admin/Admin').then((m) => ({ default: m.AdminVerifiers })))
+const AdminPlots = lazy(() => import('./pages/app/admin/Admin').then((m) => ({ default: m.AdminPlots })))
+const AdminReports = lazy(() => import('./pages/app/admin/Admin').then((m) => ({ default: m.AdminReports })))
+const GroupList = lazy(() => import('./pages/app/community/Groups').then((m) => ({ default: m.GroupList })))
+const GroupDetail = lazy(() => import('./pages/app/community/Groups').then((m) => ({ default: m.GroupDetail })))
+const SessionList = lazy(() => import('./pages/app/community/Sessions').then((m) => ({ default: m.SessionList })))
+const SessionDetail = lazy(() => import('./pages/app/community/Sessions').then((m) => ({ default: m.SessionDetail })))
+const Marketplace = lazy(() => import('./pages/app/community/Market').then((m) => ({ default: m.Marketplace })))
+const ListingDetail = lazy(() => import('./pages/app/community/Market').then((m) => ({ default: m.ListingDetail })))
+const MyOffers = lazy(() => import('./pages/app/community/Market').then((m) => ({ default: m.MyOffers })))
+const PublicProfile = lazy(() => import('./pages/app/community/PublicProfile'))
+const HelpCenter = lazy(() => import('./pages/app/Support').then((m) => ({ default: m.HelpCenter })))
+const TicketPage = lazy(() => import('./pages/app/Support').then((m) => ({ default: m.TicketPage })))
+const AdminSupport = lazy(() => import('./pages/app/Support').then((m) => ({ default: m.AdminSupport })))
+
+function PageLoading() {
+  return (
+    <div className="d-grid" style={{ minHeight: '50vh', placeItems: 'center' }} role="status">
+      <span className="spinner-border text-success" aria-hidden="true" /><span className="visually-hidden">Loading…</span>
+    </div>
+  )
+}
 
 function NotFound() {
   return (
@@ -59,6 +81,7 @@ const A = ['admin']
 
 export default function App() {
   return (
+    <Suspense fallback={<PageLoading />}>
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/credits" element={<Credits />} />
@@ -121,5 +144,6 @@ export default function App() {
 
       <Route path="*" element={<NotFound />} />
     </Routes>
+    </Suspense>
   )
 }

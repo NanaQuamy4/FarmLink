@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import SiteNav from '../components/SiteNav'
 import SiteFooter from '../components/SiteFooter'
+import { img } from '../lib/img'
 
 // Attribution for Wikimedia Commons photos (required by CC BY / CC BY-SA licences).
 export default function Credits() {
@@ -22,7 +23,7 @@ export default function Credits() {
           {credits.map((c) => (
             <div className="col-sm-6 col-lg-4" key={c.file}>
               <div className="fl-card p-0 overflow-hidden">
-                <img src={c.file} alt={c.title} className="w-100 object-fit-cover" style={{ height: 180 }} loading="lazy" />
+                <img src={img(c.file, 'sm')} alt={c.title} className="w-100 object-fit-cover" style={{ height: 180 }} loading="lazy" />
                 <div className="p-3 small">
                   <div className="fw-semibold">{c.title}</div>
                   <div className="text-muted-fl">{c.author} · {c.license}</div>

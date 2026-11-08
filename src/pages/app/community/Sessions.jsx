@@ -4,6 +4,7 @@ import { supabase, errorMessage } from '../../../lib/supabase'
 import { useAuth } from '../../../lib/auth'
 import { useQuery } from '../../../lib/useQuery'
 import { photoUrl } from '../../../lib/storage'
+import { img } from '../../../lib/img'
 import { PageHeader, Loading, ErrorAlert, EmptyState, ActionButton, Field, Avatar } from '../../../components/ui'
 import { REGIONS } from '../../../lib/constants'
 import { fmtDateTime, displayName, timeAgo } from '../../../lib/format'
@@ -13,9 +14,9 @@ import { fmtDateTime, displayName, timeAgo } from '../../../lib/format'
 // to 5 minutes). FarmLink handles registration, attendance, materials, Q&A and feedback.
 
 const COVERS = [
-  ['/images/maize-field.jpg', 'Maize field'], ['/images/irrigating-farm.jpg', 'Irrigation'], ['/images/crop-rows.jpg', 'Crop rows'],
-  ['/images/maize-harvest.jpg', 'Harvest'], ['/images/cabbage-farm.jpg', 'Vegetables'], ['/images/farmer-tablet.jpg', 'Farmer with tablet'],
-  ['/images/cocoa-drying.jpg', 'Cocoa'], ['/images/cassava-harvest.jpg', 'Cassava'], ['/images/farmers-weeding.jpg', 'Group work'],
+  ['/images/maize-field.webp', 'Maize field'], ['/images/irrigating-farm.webp', 'Irrigation'], ['/images/crop-rows.webp', 'Crop rows'],
+  ['/images/maize-harvest.webp', 'Harvest'], ['/images/cabbage-farm.webp', 'Vegetables'], ['/images/farmer-tablet.webp', 'Farmer with tablet'],
+  ['/images/cocoa-drying.webp', 'Cocoa'], ['/images/cassava-harvest.webp', 'Cassava'], ['/images/farmers-weeding.webp', 'Group work'],
 ]
 const endOf = (s) => new Date(new Date(s.starts_at).getTime() + s.duration_minutes * 60000)
 const stateOf = (s) => {
@@ -115,7 +116,7 @@ function SessionForm({ profile, session, onDone, onCancel }) {
             {COVERS.map(([src, label]) => (
               <button key={src} type="button" aria-label={label} aria-pressed={f.cover_image === src} onClick={() => setF({ ...f, cover_image: src })}
                 className="p-0 border-0 rounded-3 overflow-hidden" style={{ outline: f.cover_image === src ? '3px solid var(--fl-lime)' : 'none', outlineOffset: 2 }}>
-                <img src={src} alt="" className="d-block object-fit-cover" style={{ width: 92, height: 62, opacity: f.cover_image === src ? 1 : 0.7 }} />
+                <img src={img(src, 'sm')} alt="" className="d-block object-fit-cover" style={{ width: 92, height: 62, opacity: f.cover_image === src ? 1 : 0.7 }} />
               </button>
             ))}
           </div>
@@ -159,7 +160,7 @@ export function SessionList() {
 
   return (
     <div className="fl-page">
-      <PageHeader image="/images/farmer-tablet.jpg" eyebrow="Education sessions" title="Learn from experts," accent="wherever you farm."
+      <PageHeader image="/images/farmer-tablet.webp" eyebrow="Education sessions" title="Learn from experts," accent="wherever you farm."
         text="Live video sessions with extension officers and experts. Join from any phone browser, ask questions and keep the notes."
         actions={canHost && <button type="button" className="btn btn-primary btn-lg" onClick={() => setCreating(!creating)}><i className="bi bi-plus-lg me-1" />Schedule a session</button>} />
       {creating && <SessionForm profile={profile} onCancel={() => setCreating(false)} onDone={() => { setCreating(false); reload() }} />}
@@ -182,7 +183,7 @@ export function SessionList() {
               <div className="col-md-6 col-xl-4" key={s.id}>
                 <div className="fl-session-card fl-lift h-100">
                   <Link to={`/sessions/${s.id}`} className="fl-session-cover">
-                    <img src={s.cover_image || '/images/farmer-tablet.jpg'} alt="" />
+                    <img src={img(s.cover_image || '/images/farmer-tablet.webp', 'sm')} alt="" loading="lazy" />
                     <span className="fl-session-date"><span>{d.toLocaleDateString('en-GB', { month: 'short' })}</span><strong>{d.getDate()}</strong></span>
                     {st === 'live' && <span className="fl-pill lime position-absolute top-0 end-0 m-3"><span className="fl-live-dot" />Live now</span>}
                     {s.topic && st !== 'live' && <span className="fl-pill glass position-absolute top-0 end-0 m-3">{s.topic}</span>}
@@ -488,7 +489,7 @@ export function SessionDetail() {
   return (
     <div className="fl-page">
       <Link to="/sessions" className="small d-inline-block mb-3"><i className="bi bi-arrow-left me-1" />Sessions</Link>
-      <PageHeader image={s.cover_image || '/images/farmer-tablet.jpg'} eyebrow={[s.topic, s.region].filter(Boolean).join(' · ') || 'Education session'} title={s.title}
+      <PageHeader image={img(s.cover_image || '/images/farmer-tablet.webp')} eyebrow={[s.topic, s.region].filter(Boolean).join(' · ') || 'Education session'} title={s.title}
         text={`${fmtDateTime(s.starts_at)} · ${s.duration_minutes} minutes · hosted by ${s.host.full_name}`}
         actions={st === 'live' ? <span className="fl-pill lime"><span className="fl-live-dot" />Live now</span> : st === 'ended' ? <span className="fl-pill dark">Ended</span> : null}
         stats={[

@@ -17,7 +17,7 @@ export default function MyPlots() {
 
   return (
     <div className="fl-page">
-      <PageHeader image="/images/corn-field.jpg" eyebrow="My plots" title="Your land," accent="on record." text="Plots are checked by a verifier before farmers can see them."
+      <PageHeader image="/images/corn-field.webp" eyebrow="My plots" title="Your land," accent="on record." text="Plots are checked by a verifier before farmers can see them."
         actions={<Link to="/plots/new" className="btn btn-primary btn-lg"><i className="bi bi-plus-lg me-1" />List a plot</Link>} />
       <ErrorAlert error={error} onRetry={reload} />
       <div className="d-flex flex-wrap gap-2 mb-4" role="tablist">

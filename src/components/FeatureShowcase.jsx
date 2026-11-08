@@ -26,7 +26,7 @@ function ListVerify() {
           </div>
           <div className="d-flex gap-2 mt-3">
             {['idle-land-green', 'idle-land-dry', 'corn-field'].map((p) => (
-              <img key={p} src={`/images/${p}.jpg`} alt="" className="rounded-3 object-fit-cover" style={{ width: 64, height: 48 }} loading="lazy" />
+              <img key={p} src={`/images/sm/${p}.webp`} alt="" className="rounded-3 object-fit-cover" style={{ width: 64, height: 48 }} loading="lazy" />
             ))}
             <span className="d-grid place-items-center rounded-3 border text-muted-fl" style={{ width: 64, height: 48, placeItems: 'center', display: 'grid' }}><i className="bi bi-plus-lg" /></span>
           </div>
@@ -67,7 +67,7 @@ function SearchMap() {
         <div className="col-md-5 d-grid gap-2">
           {[['2.5 acres · Techiman', 'Loamy · Stream', 'corn-field'], ['4 acres · Kintampo', 'Sandy loam · Borehole', 'crop-rows']].map(([t, d, img]) => (
             <div className="fl-mock fl-mock-sm d-flex gap-2 align-items-center" key={t}>
-              <img src={`/images/${img}.jpg`} alt="" className="rounded-3 object-fit-cover" style={{ width: 56, height: 56 }} loading="lazy" />
+              <img src={`/images/sm/${img}.webp`} alt="" className="rounded-3 object-fit-cover" style={{ width: 56, height: 56 }} loading="lazy" />
               <div><div className="fw-semibold">{t}</div><div className="text-muted-fl">{d}</div><span className="fl-status verified mt-1">Verified</span></div>
             </div>
           ))}
@@ -159,7 +159,7 @@ function Season() {
           <div className="col-6 col-md-3" key={name}>
             <div className="fl-mock fl-mock-sm p-2 h-100">
               <div className="position-relative">
-                <img src={`/images/${img}.jpg`} alt="" className="w-100 rounded-3 object-fit-cover" style={{ height: 90, filter: date ? 'none' : 'grayscale(1) opacity(.45)' }} loading="lazy" />
+                <img src={`/images/sm/${img}.webp`} alt="" className="w-100 rounded-3 object-fit-cover" style={{ height: 90, filter: date ? 'none' : 'grayscale(1) opacity(.45)' }} loading="lazy" />
                 <span className="position-absolute top-0 start-0 m-1 badge rounded-pill" style={{ background: date ? 'var(--fl-lime)' : '#fff', color: 'var(--fl-deep)' }}>{n + 1}</span>
               </div>
               <div className="fw-semibold mt-2">{name}</div>
@@ -186,7 +186,7 @@ function Harvest() {
           <div className="text-muted-fl">Yield</div><div className="fw-semibold mb-2">42 bags of maize</div>
           <div className="text-muted-fl">Sold at</div><div className="fw-semibold mb-2">GH₵ 450 per bag</div>
           <div className="text-muted-fl">Photo</div>
-          <img src="/images/maize-harvest.jpg" alt="" className="w-100 rounded-3 object-fit-cover" style={{ height: 70 }} loading="lazy" />
+          <img src="/images/maize-harvest.webp" alt="" className="w-100 rounded-3 object-fit-cover" style={{ height: 70 }} loading="lazy" />
         </div>
       </div>
       <div className="col-md-7 d-grid gap-2">

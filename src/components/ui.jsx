@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { photoUrl } from '../lib/storage'
+import { img } from '../lib/img'
 import { initials } from '../lib/format'
 
 export function StatusBadge({ map, value }) {
@@ -113,16 +114,16 @@ export function Avatar({ profile, size = 40 }) {
 }
 
 // Image from a storage path (signed URL) or a site path
-export function Photo({ path, bucket, alt = '', className = '', style }) {
-  const [src, setSrc] = useState(path?.startsWith('/') ? path : null)
+export function Photo({ path, bucket, alt = '', className = '', style, size }) {
+  const [src, setSrc] = useState(path?.startsWith('/') ? img(path, size) : null)
   useEffect(() => {
     let live = true
     if (path && !path.startsWith('/')) photoUrl(path, bucket).then((u) => live && setSrc(u))
-    else setSrc(path || null)
+    else setSrc(img(path, size) || null)
     return () => { live = false }
-  }, [path, bucket])
+  }, [path, bucket, size])
   if (!src) return <div className={`bg-light ${className}`} style={{ ...style, background: '#E8EDE3' }} aria-hidden="true" />
-  return <img src={src} alt={alt} className={className} style={style} loading="lazy" />
+  return <img src={src} alt={alt} className={className} style={style} loading="lazy" decoding="async" />
 }
 
 // Button that runs an async action with a spinner and reports errors through onError

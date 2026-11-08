@@ -15,21 +15,21 @@ import CommunitySection from '../components/CommunitySection'
 // Each slide's floating cards describe an example plot and split for that crop.
 const slides = [
   {
-    src: '/images/hero-pineapple-farm.jpg',
+    src: '/images/hero-pineapple-farm.webp',
     alt: 'A smiling woman in a lime shirt presenting her pineapple farm',
     pos: '80% center', posLg: 'center center',
     plot: { size: '3 acres', place: 'Ekumfi', detail: 'Sandy loam · Borehole' },
     split: { crop: 'pineapples', unit: 'fruits', total: 1200, pct: 30 },
   },
   {
-    src: '/images/hero-vegetable-crate.jpg',
+    src: '/images/hero-vegetable-crate.webp',
     alt: 'A smiling farmer carrying a crate of fresh vegetables along a farm road',
     pos: '72% 30%', posLg: 'center 30%',
     plot: { size: '1.5 acres', place: 'Akuapem', detail: 'Clay loam · Irrigated' },
     split: { crop: 'vegetables', unit: 'crates', total: 60, pct: 25 },
   },
   {
-    src: '/images/hero-farmer-maize.jpg',
+    src: '/images/hero-farmer-maize.webp',
     alt: 'A smiling young farmer with a hoe showing his healthy green maize field',
     pos: '74% 0%', posLg: 'center 0%',
     plot: { size: '2.5 acres', place: 'Techiman', detail: 'Loamy soil · Stream nearby' },
@@ -47,8 +47,8 @@ const steps = [
 const regions = ['Ashanti', 'Bono East', 'Northern', 'Volta', 'Eastern', 'Bono', 'Upper East', 'Central']
 
 const modules = [
-  { icon: 'bi-basket', title: 'Produce marketplace', text: 'After harvest, farmers and groups list produce. Buyers send offers that the farmer accepts or declines.', img: '/images/market-okro-seller.jpg', fr: 'FR15 · FR16' },
-  { icon: 'bi-star', title: 'Ratings & public profiles', text: 'Both parties rate each other after a season. Profiles show completed seasons, sessions attended and ratings.', img: '/images/farmer-basket.jpg', fr: 'FR17' },
+  { icon: 'bi-basket', title: 'Produce marketplace', text: 'After harvest, farmers and groups list produce. Buyers send offers that the farmer accepts or declines.', img: '/images/sm/market-okro-seller.webp', fr: 'FR15 · FR16' },
+  { icon: 'bi-star', title: 'Ratings & public profiles', text: 'Both parties rate each other after a season. Profiles show completed seasons, sessions attended and ratings.', img: '/images/sm/farmer-basket.webp', fr: 'FR17' },
 ]
 
 const faqs = [
@@ -65,9 +65,11 @@ export default function Landing() {
   useReveal()
   const [slide, goTo] = useRotator(slides.length, 7000)
   const [heroReady, setHeroReady] = useState(false)
+  const [loadAllSlides, setLoadAllSlides] = useState(false)
   useEffect(() => {
     const id = requestAnimationFrame(() => setHeroReady(true))
-    return () => cancelAnimationFrame(id)
+    const later = setTimeout(() => setLoadAllSlides(true), 2500) // the other slides after the first paint
+    return () => { cancelAnimationFrame(id); clearTimeout(later) }
   }, [])
   const current = slides[slide]
   const heroSplit = calculateHarvestSplit({ total: current.split.total, landownerPercent: current.split.pct })
@@ -82,7 +84,7 @@ export default function Landing() {
           {slides.map((sl, n) => (
             <img
               key={sl.src}
-              src={sl.src}
+              src={n === 0 || loadAllSlides ? sl.src : undefined}
               alt={n === slide ? sl.alt : ''}
               aria-hidden={n !== slide}
               className={`position-absolute top-0 start-0 fl-cover fl-hero-slide${n === slide && heroReady ? ' active' : ''}`}
@@ -160,7 +162,7 @@ export default function Landing() {
         <p className="fl-h-section fw-medium mb-0" data-reveal style={{ fontFamily: 'Outfit', maxWidth: 1050, color: 'var(--fl-ink)', ...i(1) }}>
           Many landowners hold unused plots, and many young people want to farm but cannot get land.{' '}
           <span className="text-muted-fl">Their arrangements are usually verbal, so terms get forgotten and harvests get disputed.</span>{' '}
-          FarmLink puts the whole partnership <img src="/images/corn-field.jpg" alt="" className="d-inline-block align-middle rounded-pill object-fit-cover" style={{ width: '6rem', height: '2.6rem' }} /> on record.
+          FarmLink puts the whole partnership <img src="/images/sm/corn-field.webp" alt="" className="d-inline-block align-middle rounded-pill object-fit-cover" style={{ width: '6rem', height: '2.6rem' }} /> on record.
         </p>
       </section>
 
@@ -179,7 +181,7 @@ export default function Landing() {
           <div className="row g-4">
             <div className="col-lg-5" data-reveal="zoom">
               <div className="position-relative h-100 rounded-fl-xl overflow-hidden" style={{ minHeight: 420 }}>
-                <img src="/images/farmers-weeding.jpg" alt="Farmers weeding a field together" className="position-absolute fl-cover" />
+                <img src="/images/farmers-weeding.webp" alt="Farmers weeding a field together" className="position-absolute fl-cover" />
                 <div className="position-absolute bottom-0 start-0 end-0 p-3">
                   <div className="fl-float">
                     <div className="d-flex justify-content-between align-items-center mb-3">
@@ -226,7 +228,7 @@ export default function Landing() {
         <div className="row g-4">
           <div className="col-md-6 col-lg-4" id="landowners" data-reveal>
             <Link to="/register?role=landowner" className="fl-img-card">
-              <img src="/images/corn-field.jpg" alt="A large green corn field" />
+              <img src="/images/sm/corn-field.webp" alt="A large green corn field" loading="lazy" />
               <div className="fl-img-card-body">
                 <span className="fl-pill lime mb-3">Landowners</span>
                 <h3 className="h4">Put idle land to work</h3>
@@ -236,7 +238,7 @@ export default function Landing() {
           </div>
           <div className="col-md-6 col-lg-4" id="farmers" data-reveal style={i(1)}>
             <Link to="/register?role=farmer" className="fl-img-card">
-              <img src="/images/farmer-basket.jpg" alt="A smiling farmer holding a basket of freshly harvested vegetables" />
+              <img src="/images/sm/farmer-basket.webp" alt="A smiling farmer holding a basket of freshly harvested vegetables" loading="lazy" />
               <div className="fl-img-card-body">
                 <span className="fl-pill lime mb-3">Youth farmers & groups</span>
                 <h3 className="h4">Find land you can farm</h3>
@@ -246,7 +248,7 @@ export default function Landing() {
           </div>
           <div className="col-md-12 col-lg-4" data-reveal style={i(2)}>
             <div className="fl-img-card">
-              <img src="/images/verifier-survey.jpg" alt="A woman with a clipboard checking a farm" />
+              <img src="/images/sm/verifier-survey.webp" alt="A woman with a clipboard checking a farm" loading="lazy" />
               <div className="fl-img-card-body">
                 <span className="fl-pill lime mb-3">Verifiers</span>
                 <h3 className="h4">Check plots, settle disputes</h3>
@@ -276,7 +278,7 @@ export default function Landing() {
         <div className="row g-4">
           <div className="col-lg-5" data-reveal="zoom">
             <div className="rounded-fl-xl overflow-hidden h-100" style={{ minHeight: 360 }}>
-              <img src="/images/maize-harvest.jpg" alt="A farmer drying harvested maize" className="fl-cover" />
+              <img src="/images/maize-harvest.webp" alt="A farmer drying harvested maize" className="fl-cover" />
             </div>
           </div>
           <div className="col-lg-7" data-reveal style={i(1)}>
@@ -361,7 +363,7 @@ export default function Landing() {
       {/* ---------- CTA ---------- */}
       <section className="container" data-reveal="zoom">
         <div className="position-relative overflow-hidden rounded-fl-xl text-white p-4 p-md-5" style={{ isolation: 'isolate' }}>
-          <img src="/images/crop-rows-sunset.jpg" alt="" className="position-absolute top-0 start-0 fl-cover" style={{ zIndex: -2 }} loading="lazy" />
+          <img src="/images/crop-rows-sunset.webp" alt="" className="position-absolute top-0 start-0 fl-cover" style={{ zIndex: -2 }} loading="lazy" />
           <div className="position-absolute top-0 start-0 w-100 h-100" style={{ zIndex: -1, background: 'linear-gradient(90deg, rgba(3,43,31,.92), rgba(3,43,31,.55))' }} />
           <div className="row align-items-center g-4 py-md-4">
             <div className="col-lg-7">

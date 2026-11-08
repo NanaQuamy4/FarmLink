@@ -93,7 +93,7 @@ export default function CommunitySection() {
           {/* Group chat over a photo of shared work */}
           <div className="col-md-6 col-lg-4" data-reveal style={{ '--i': 2 }}>
             <div className="position-relative h-100 rounded-fl-xl overflow-hidden" style={{ minHeight: 420 }}>
-              <img src="/images/farmers-weeding.jpg" alt="A group of farmers weeding a field together" className="position-absolute fl-cover" loading="lazy" />
+              <img src="/images/sm/farmers-weeding.webp" alt="A group of farmers weeding a field together" className="position-absolute fl-cover" loading="lazy" />
               <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(180deg, rgba(3,43,31,0) 30%, rgba(3,43,31,.85))' }} />
               <div className="position-absolute bottom-0 start-0 end-0 p-3 d-grid gap-2">
                 <div className="fl-bubble them" style={{ background: 'rgba(255,255,255,.92)', color: 'var(--fl-ink)' }}><strong className="d-block small">Efua</strong>Who has a sprayer we can share on Saturday?</div>

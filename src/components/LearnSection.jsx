@@ -13,9 +13,9 @@ const fmtDate = (d) => d.toLocaleDateString('en-GB', { weekday: 'short', day: 'n
 const fmtTime = (d) => d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 
 const upcoming = [
-  { id: 1, topic: 'Controlling fall armyworm in maize', host: 'Extension officer · Bono East', in: 3, hour: 10, seats: 60, taken: 41, tag: 'Maize', img: '/images/maize-field.jpg' },
-  { id: 2, topic: 'Dry-season vegetables with drip irrigation', host: 'Agronomist · Volta', in: 7, hour: 16, seats: 40, taken: 18, tag: 'Vegetables', img: '/images/irrigating-farm.jpg' },
-  { id: 3, topic: 'Reading your soil before you plant', host: 'Soil scientist · Ashanti', in: 12, hour: 11, seats: 80, taken: 23, tag: 'Soil', img: '/images/crop-rows.jpg' },
+  { id: 1, topic: 'Controlling fall armyworm in maize', host: 'Extension officer · Bono East', in: 3, hour: 10, seats: 60, taken: 41, tag: 'Maize', img: '/images/sm/maize-field.webp' },
+  { id: 2, topic: 'Dry-season vegetables with drip irrigation', host: 'Agronomist · Volta', in: 7, hour: 16, seats: 40, taken: 18, tag: 'Vegetables', img: '/images/sm/irrigating-farm.webp' },
+  { id: 3, topic: 'Reading your soil before you plant', host: 'Soil scientist · Ashanti', in: 12, hour: 11, seats: 80, taken: 23, tag: 'Soil', img: '/images/sm/crop-rows.webp' },
 ]
 
 const recordings = [
@@ -48,7 +48,7 @@ export default function LearnSection() {
         {/* Photo with live session overlay */}
         <div className="col-lg-5" data-reveal="zoom">
           <div className="position-relative h-100 rounded-fl-xl overflow-hidden" style={{ minHeight: 440 }}>
-            <img src="/images/farmer-tablet.jpg" alt="A farmer in his field following a lesson on a tablet" className="position-absolute fl-cover" loading="lazy" />
+            <img src="/images/farmer-tablet.webp" alt="A farmer in his field following a lesson on a tablet" className="position-absolute fl-cover" loading="lazy" />
             <div className="position-absolute top-0 start-0 m-3"><span className="fl-pill lime"><span className="fl-live-dot" />Live now · 112 farmers</span></div>
             <div className="position-absolute bottom-0 start-0 end-0 p-3">
               <div className="fl-float">
