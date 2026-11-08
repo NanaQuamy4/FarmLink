@@ -695,7 +695,7 @@ export function SessionDetail() {
               <div className="fl-card p-4 h-auto d-grid gap-2">
                 <h2 className="h6 mb-1">Host tools</h2>
                 <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => setEditing(!editing)}><i className="bi bi-pencil me-1" />Edit details or reschedule</button>
-                <div className="small fw-semibold mt-2">After the session (FR14)</div>
+                <div className="small fw-semibold mt-2">After the session</div>
                 <input className="form-control form-control-sm" placeholder="Link to notes or slides" aria-label="Notes link" value={l.notes_url} onChange={(e) => setLinks({ ...l, notes_url: e.target.value })} />
                 <input className="form-control form-control-sm" placeholder="Link to the recording" aria-label="Recording link" value={l.recording_url} onChange={(e) => setLinks({ ...l, recording_url: e.target.value })} />
                 <ActionButton className="btn btn-sm btn-primary" disabled={!links} onClick={saveLinks}>Save and notify registered</ActionButton>

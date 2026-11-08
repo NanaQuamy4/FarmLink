@@ -38,7 +38,7 @@ export default function SiteFooter() {
           </div>
         </div>
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2 pt-4 small">
-          <span>© {new Date().getFullYear()} FarmLink. Diploma in IT final year project.</span>
+          <span>© {new Date().getFullYear()} FarmLink</span>
           <Link className="link-light link-opacity-75 text-decoration-none" to="/credits">Photo credits</Link>
         </div>
       </div>

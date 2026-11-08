@@ -1,6 +1,6 @@
 # FarmLink
 
-A web platform that connects landowners who have idle farmland with youth farmers, and records the partnership from agreement to harvest split. Diploma in IT final year project.
+A web platform that connects landowners who have idle farmland with youth farmers, and records the partnership from agreement to harvest split.
 
 **Stack:** React 18 + Vite, Bootstrap 5 (custom theme), Supabase (Auth, PostgreSQL with Row Level Security, Realtime, Storage), Leaflet + OpenStreetMap, jsPDF and SheetJS for reports.
 
@@ -30,7 +30,7 @@ All passwords: `FarmLink#2026`. The login page has one-click buttons for these i
 | admin@farmlink.test | Administrator | Approve Samuel’s verifier request, reports and exports |
 | buyer@farmlink.test | Buyer | Offers on tomatoes and pineapples |
 
-## Requirements map
+## Where each feature lives
 
 | ID | Where |
 |---|---|
@@ -50,7 +50,7 @@ All passwords: `FarmLink#2026`. The login page has one-click buttons for these i
 | FR15–16 | `community/Market.jsx`, `respond_to_offer()` |
 | FR17 | `ratings`, `community/PublicProfile.jsx`, `profile_stats()` |
 
-## Changes from the proposal
+## Design decisions
 
 - **Video sessions open Jitsi Meet in a new tab** instead of embedding it. The public meet.jit.si server no longer allows embedding beyond a 5-minute demo; a new tab is free and unlimited. Attendance is recorded when the user clicks Join.
 - **Sign-in is by email.** Phone sign-in needs a paid SMS provider. The phone number is stored on the profile (privately) and used for verification calls.

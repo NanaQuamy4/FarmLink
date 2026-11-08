@@ -329,7 +329,7 @@ export default function Landing() {
               <div className="fl-card fl-lift fl-zoom p-0 overflow-hidden d-flex flex-column flex-sm-row h-100">
                 <div className="overflow-hidden flex-none" style={{ flexBasis: '42%' }}><img src={m.img} alt="" className="w-100 h-100 object-fit-cover" style={{ minHeight: 220 }} loading="lazy" /></div>
                 <div className="p-4">
-                  <div className="d-flex justify-content-between align-items-start mb-3"><span className="fl-icon-tile"><i className={`bi ${m.icon}`} /></span><span className="small fw-semibold text-muted-fl">{m.fr}</span></div>
+                  <div className="d-flex justify-content-between align-items-start mb-3"><span className="fl-icon-tile"><i className={`bi ${m.icon}`} /></span></div>
                   <h3 className="h5">{m.title}</h3>
                   <p className="small text-muted-fl mb-0">{m.text}</p>
                 </div>

@@ -338,7 +338,6 @@ export default function FeatureShowcase() {
                   <span className="fl-tab-title d-block">{f.title}</span>
                   <span className="fl-tab-text">{f.text}</span>
                 </span>
-                <span className="fl-fr">{f.fr}</span>
               </button>
             ))}
           </div>
@@ -347,7 +346,6 @@ export default function FeatureShowcase() {
           <div className="fl-stage fl-stage-sticky fl-on-dark" role="tabpanel" id={`panel-${features[active].id}`} aria-labelledby={`tab-${features[active].id}`}>
             <div className="d-flex align-items-center justify-content-between mb-4">
               <div>
-                <div className="small text-lime fw-semibold">{features[active].fr}</div>
                 <h3 className="h4 text-white mb-0">{features[active].title}</h3>
               </div>
               <span className="small" style={{ opacity: 0.7 }}>{active + 1} / {features.length}</span>
