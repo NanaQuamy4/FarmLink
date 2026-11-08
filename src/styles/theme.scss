@@ -396,3 +396,12 @@ $fl-ease: cubic-bezier(.2, .7, .2, 1);
 .fl-feature-tab .fl-fr { white-space: nowrap; }
 .fl-stage { height: auto; }
 @include media-breakpoint-up(lg) { .fl-stage-sticky { position: sticky; top: 7.5rem; } }
+
+// Education & community helpers
+.fl-row-hover { transition: background-color .2s ease; &:hover { background: var(--fl-ground); } }
+.flex-none { flex: none; }
+.min-w-0 { min-width: 0; }
+.fl-live-dot { width: .5rem; height: .5rem; border-radius: 50%; background: #D93A2B; box-shadow: 0 0 0 0 rgba(217, 58, 43, .6); animation: fl-live 1.6s infinite; }
+@keyframes fl-live { 0% { box-shadow: 0 0 0 0 rgba(217, 58, 43, .6); } 70% { box-shadow: 0 0 0 .5rem rgba(217, 58, 43, 0); } 100% { box-shadow: 0 0 0 0 rgba(217, 58, 43, 0); } }
+.fl-section-dark .fl-mock h1, .fl-section-dark .fl-mock h2, .fl-section-dark .fl-mock h3 { color: var(--fl-ink); }
+@media (prefers-reduced-motion: reduce) { .fl-live-dot { animation: none; } }

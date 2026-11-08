@@ -8,6 +8,8 @@ import { useReveal } from '../lib/useReveal'
 import { useRotator } from '../lib/useRotator'
 import { calculateHarvestSplit } from '../lib/harvestSplit'
 import FeatureShowcase from '../components/FeatureShowcase'
+import LearnSection from '../components/LearnSection'
+import CommunitySection from '../components/CommunitySection'
 
 // Hero slides. pos / posLg keep the person clear of the headline on phones and desktops.
 // Each slide's floating cards describe an example plot and split for that crop.
@@ -45,10 +47,8 @@ const steps = [
 const regions = ['Ashanti', 'Bono East', 'Northern', 'Volta', 'Eastern', 'Bono', 'Upper East', 'Central']
 
 const modules = [
-  { icon: 'bi-camera-video', title: 'Education sessions', text: 'Register for expert-led video sessions and keep the notes afterwards.', img: '/images/farmer-tablet.jpg' },
-  { icon: 'bi-people', title: 'Farmer groups', text: 'Join groups by region or crop, with group chat and a notice board.', img: '/images/farmers-weeding.jpg' },
-  { icon: 'bi-basket', title: 'Produce marketplace', text: 'List your harvest and accept or decline offers from buyers.', img: '/images/market-okro-seller.jpg' },
-  { icon: 'bi-star', title: 'Ratings & profiles', text: 'Public profiles show completed seasons, sessions attended and ratings.', img: '/images/irrigating-farm.jpg' },
+  { icon: 'bi-basket', title: 'Produce marketplace', text: 'After harvest, farmers and groups list produce. Buyers send offers that the farmer accepts or declines.', img: '/images/market-okro-seller.jpg', fr: 'FR15 · FR16' },
+  { icon: 'bi-star', title: 'Ratings & public profiles', text: 'Both parties rate each other after a season. Profiles show completed seasons, sessions attended and ratings.', img: '/images/farmer-basket.jpg', fr: 'FR17' },
 ]
 
 const faqs = [
@@ -306,30 +306,34 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ---------- More than land ---------- */}
-      <section className="fl-section fl-section-dark fl-on-dark fl-rounded-band">
-        <div className="container">
-          <div className="row g-4 align-items-end mb-5">
-            <div className="col-lg-6" data-reveal>
-              <span className="fl-eyebrow mb-3">Beyond the plot</span>
-              <h2 className="fl-h-section mb-0">Learn, connect <span className="fl-serif text-lime">and sell</span></h2>
-            </div>
-            <div className="col-lg-5 offset-lg-1" data-reveal style={i(1)}><p className="mb-0">Extended modules help new farmers grow beyond their first season.</p></div>
+      {/* ---------- Education ---------- */}
+      <LearnSection />
+
+      {/* ---------- Community ---------- */}
+      <CommunitySection />
+
+      {/* ---------- Marketplace & ratings ---------- */}
+      <section className="fl-section container">
+        <div className="row g-4 align-items-end mb-5">
+          <div className="col-lg-6" data-reveal>
+            <span className="fl-eyebrow mb-3">After the harvest</span>
+            <h2 className="fl-h-section mb-0">Sell your produce, <span className="fl-serif text-deep">build your name</span></h2>
           </div>
-          <div className="row g-4">
-            {modules.map((m, n) => (
-              <div className="col-md-6 col-lg-3" key={m.title} data-reveal style={i(n)}>
-                <div className="fl-card-dark fl-lift fl-zoom p-0 overflow-hidden">
-                  <div className="overflow-hidden"><img src={m.img} alt="" className="w-100 object-fit-cover" style={{ height: 190 }} loading="lazy" /></div>
-                  <div className="p-4">
-                    <span className="fl-icon-tile mb-3"><i className={`bi ${m.icon}`} /></span>
-                    <h3 className="h5">{m.title}</h3>
-                    <p className="small mb-0">{m.text}</p>
-                  </div>
+          <div className="col-lg-5 offset-lg-1" data-reveal style={i(1)}><p className="fl-lead mb-0">A good season should lead to buyers and to a reputation that helps you get your next plot.</p></div>
+        </div>
+        <div className="row g-4">
+          {modules.map((m, n) => (
+            <div className="col-md-6" key={m.title} data-reveal style={i(n)}>
+              <div className="fl-card fl-lift fl-zoom p-0 overflow-hidden d-flex flex-column flex-sm-row h-100">
+                <div className="overflow-hidden flex-none" style={{ flexBasis: '42%' }}><img src={m.img} alt="" className="w-100 h-100 object-fit-cover" style={{ minHeight: 220 }} loading="lazy" /></div>
+                <div className="p-4">
+                  <div className="d-flex justify-content-between align-items-start mb-3"><span className="fl-icon-tile"><i className={`bi ${m.icon}`} /></span><span className="small fw-semibold text-muted-fl">{m.fr}</span></div>
+                  <h3 className="h5">{m.title}</h3>
+                  <p className="small text-muted-fl mb-0">{m.text}</p>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
 
