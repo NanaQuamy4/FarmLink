@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import Brand from './Brand'
+import { useAuth } from '../lib/auth'
 
 const links = [
   { href: '/#how-it-works', label: 'How it works' },
@@ -14,6 +15,7 @@ const links = [
 // Public site navigation. `overlay` floats over the hero photo with white text,
 // then fills in with deep green once the page is scrolled.
 export default function SiteNav({ overlay = false }) {
+  const { session } = useAuth()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -52,8 +54,14 @@ export default function SiteNav({ overlay = false }) {
             ))}
           </ul>
           <div className="d-flex gap-2 align-items-center pb-3 pb-lg-0">
-            <NavLink to="/login" className={`btn ${overlay ? 'btn-outline-light-fl' : 'btn-outline-primary'}`}>Log in</NavLink>
-            <Link to="/register" className="btn btn-lime">Get started</Link>
+            {session ? (
+              <Link to="/dashboard" className="btn btn-lime">Go to dashboard</Link>
+            ) : (
+              <>
+                <NavLink to="/login" className={`btn ${overlay ? 'btn-outline-light-fl' : 'btn-outline-primary'}`}>Log in</NavLink>
+                <Link to="/register" className="btn btn-lime">Get started</Link>
+              </>
+            )}
           </div>
         </div>
       </div>
