@@ -30,6 +30,7 @@ import { GroupList, GroupDetail } from './pages/app/community/Groups'
 import { SessionList, SessionDetail } from './pages/app/community/Sessions'
 import { Marketplace, ListingDetail, MyOffers } from './pages/app/community/Market'
 import PublicProfile from './pages/app/community/PublicProfile'
+import { HelpCenter, TicketPage, AdminSupport } from './pages/app/Support'
 
 function NotFound() {
   return (
@@ -71,6 +72,10 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/help" element={<HelpCenter />} />
+        <Route path="/help/:id" element={<TicketPage />} />
+        <Route path="/admin/support" element={<RequireRole roles={A}><AdminSupport /></RequireRole>} />
+        <Route path="/admin/support/:id" element={<RequireRole roles={A}><TicketPage /></RequireRole>} />
         <Route path="/u/:id" element={<PublicProfile />} />
 
         {/* Landowner */}

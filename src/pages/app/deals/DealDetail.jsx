@@ -170,6 +170,7 @@ export default function DealDetail() {
                 </div>
               ))}
               <Link to={deal.isLandowner ? `/plots/${deal.plot_id}` : `/find/${deal.plot_id}`} className="btn btn-outline-primary"><i className="bi bi-geo-alt me-1" />View plot</Link>
+              <Link to={`/help?new=1&category=deal&about=/deals/${deal.id}`} className="btn btn-link btn-sm"><i className="bi bi-question-circle me-1" />Problem with the platform? Contact support</Link>
               {deal.status === 'drafting' && deal.isParty && (
                 <ActionButton className="btn btn-link text-danger" confirm="Cancel this deal? The plot will be listed again." onClick={cancel}>Cancel deal</ActionButton>
               )}

@@ -200,6 +200,7 @@ export default function PlotDetail() {
             )}
           </div>
           <div className="alert alert-light border small mb-0"><i className="bi bi-info-circle me-1" />Verification confirms the plot exists and matches its listing. It is not proof of land title.</div>
+          <Link to={`/help?new=1&category=plot&about=/plots/${plot.id}`} className="btn btn-link btn-sm"><i className="bi bi-question-circle me-1" />Report a problem with this listing</Link>
         </div>
       </div>
     </div>

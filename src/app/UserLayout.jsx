@@ -61,6 +61,7 @@ export default function UserLayout() {
                   <Link className="dropdown-item" to="/profile"><i className="bi bi-person me-2" />Profile & settings</Link>
                   <Link className="dropdown-item" to={`/u/${profile?.id}`}><i className="bi bi-person-vcard me-2" />Public profile</Link>
                   <Link className="dropdown-item" to="/notifications"><i className="bi bi-bell me-2" />Notifications</Link>
+                  <Link className="dropdown-item" to="/help"><i className="bi bi-question-circle me-2" />Help & support</Link>
                   <Link className="dropdown-item" to="/"><i className="bi bi-house me-2" />FarmLink home</Link>
                   <button type="button" className="dropdown-item text-danger" onClick={signOut}><i className="bi bi-box-arrow-right me-2" />Log out</button>
                 </div>
@@ -78,6 +79,9 @@ export default function UserLayout() {
           {main.map((it) => <NavLink key={it.to} to={it.to} end={it.to === '/dashboard'} className="fl-side-link"><i className={`bi ${it.icon}`} /><span>{it.label}</span></NavLink>)}
           {community.length > 0 && <div className="fl-side-section">Community</div>}
           {community.map((it) => <NavLink key={it.to} to={it.to} className="fl-side-link"><i className={`bi ${it.icon}`} /><span>{it.label}</span></NavLink>)}
+          <div className="fl-side-section">Account</div>
+          <NavLink to="/help" className="fl-side-link"><i className="bi bi-question-circle" /><span>Help & support</span></NavLink>
+          <NavLink to="/profile" className="fl-side-link"><i className="bi bi-person" /><span>Profile & settings</span></NavLink>
         </nav>
       </aside>
 

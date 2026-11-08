@@ -42,6 +42,7 @@ export const NAV = {
     { to: '/deals', label: 'Deals', icon: 'bi-file-earmark-check' },
     { to: '/admin/disputes', label: 'Disputes', icon: 'bi-shield-check' },
     { to: '/admin/reports', label: 'Reports', icon: 'bi-bar-chart', mobile: true },
+    { to: '/admin/support', label: 'Support', icon: 'bi-headset' },
     { ...common.sessions, section: 'Community' }, common.groups, common.market,
   ],
   buyer: [

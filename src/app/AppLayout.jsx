@@ -87,6 +87,7 @@ export default function AppLayout() {
                   <Link className="dropdown-item" to="/profile"><i className="bi bi-person me-2" />Profile & settings</Link>
                   <Link className="dropdown-item" to={`/u/${profile?.id}`}><i className="bi bi-person-vcard me-2" />Public profile</Link>
                   <Link className="dropdown-item" to="/notifications"><i className="bi bi-bell me-2" />Notifications</Link>
+                  <Link className="dropdown-item" to="/help"><i className="bi bi-question-circle me-2" />Help & support</Link>
                   <Link className="dropdown-item" to="/"><i className="bi bi-house me-2" />FarmLink home</Link>
                   <button type="button" className="dropdown-item text-danger" onClick={signOut}><i className="bi bi-box-arrow-right me-2" />Log out</button>
                 </div>

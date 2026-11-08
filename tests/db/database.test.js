@@ -42,6 +42,7 @@ beforeAll(async () => {
   }
   await db.exec(sql('supabase/seed.sql'))
   await db.exec(sql('supabase/migrations/0005_sessions_plus.sql'))
+  await db.exec(sql('supabase/migrations/0006_support.sql'))
   for (const r of (await db.query('select id, email from auth.users')).rows) ids[r.email.split('@')[0]] = r.id
 }, 60000)
 
@@ -347,6 +348,62 @@ describe('sessions: hosts, materials, Q&A, feedback (0005)', () => {
     const n = await one('efua', `with r as (insert into session_registrations (session_id, user_id) values (${s1}, auth.uid()) returning 1)
       select (select count(*) from r) inserted`)
     expect(Number(n.inserted)).toBe(1)
+  })
+})
+
+describe('help & support (0006)', () => {
+  // open a ticket as Kwame, then reply as admin, inside one transaction
+  async function scenario(fn) {
+    let out
+    await db.transaction(async (tx) => {
+      const asUser = async (who) => { await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ sub: ids[who] })]); await tx.exec('set local role authenticated') }
+      await asUser('kwame')
+      const t = (await tx.query(`insert into support_tickets (user_id, category, subject) values (auth.uid(), 'deal', 'Harvest split looks wrong') returning *`)).rows[0]
+      await tx.query(`insert into support_messages (ticket_id, sender_id, body) values ($1, auth.uid(), 'Please check my deal.')`, [t.id])
+      out = await fn({ tx, asUser, t })
+      await tx.rollback()
+    }).catch(() => {})
+    return out
+  }
+
+  it('a user opens a ticket and admins are notified', async () => {
+    const r = await scenario(async ({ tx, asUser }) => {
+      await asUser('admin')
+      return (await tx.query(`select count(*)::int n from notifications where user_id = auth.uid() and type = 'support_ticket'`)).rows[0].n
+    })
+    expect(r).toBe(1)
+  })
+
+  it('other users cannot see the ticket or write in it', async () => {
+    const r = await scenario(async ({ tx, asUser, t }) => {
+      await asUser('efua')
+      const seen = (await tx.query('select count(*)::int n from support_tickets')).rows[0].n
+      const msgs = (await tx.query('select count(*)::int n from support_messages')).rows[0].n
+      let blocked = false
+      await tx.query('savepoint s')
+      try { await tx.query(`insert into support_messages (ticket_id, sender_id, body) values ($1, auth.uid(), 'hi')`, [t.id]) } catch { blocked = true }
+      await tx.query('rollback to savepoint s')
+      return { seen, msgs, blocked }
+    })
+    expect(r).toEqual({ seen: 0, msgs: 0, blocked: true })
+  })
+
+  it('an admin reply is staff, marks it answered and notifies the user', async () => {
+    const r = await scenario(async ({ tx, asUser, t }) => {
+      await asUser('admin')
+      const m = (await tx.query(`insert into support_messages (ticket_id, sender_id, body) values ($1, auth.uid(), 'Checked: 30% of 38 bags is 11.4.') returning is_staff`, [t.id])).rows[0]
+      const status = (await tx.query('select status from support_tickets where id = $1', [t.id])).rows[0].status
+      await asUser('kwame')
+      const n = (await tx.query(`select count(*)::int n from notifications where user_id = auth.uid() and type = 'support_reply'`)).rows[0].n
+      return { staff: m.is_staff, status, n }
+    })
+    expect(r).toEqual({ staff: true, status: 'answered', n: 1 })
+  })
+
+  it('users cannot mark their own messages as staff', async () => {
+    const r = await scenario(async ({ tx, t }) =>
+      (await tx.query(`insert into support_messages (ticket_id, sender_id, body, is_staff) values ($1, auth.uid(), 'I am staff', true) returning is_staff`, [t.id])).rows[0].is_staff)
+    expect(r).toBe(false)
   })
 })
 
