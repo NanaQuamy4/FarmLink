@@ -715,6 +715,12 @@ begin
   return 'https://meet.jit.si/' || s.meeting_room;
 end $$;
 
+-- Seats taken per session, without revealing who registered
+create or replace function public.session_seats()
+returns table (session_id uuid, taken int) language sql stable security definer set search_path = public as $$
+  select session_id, count(*)::int from session_registrations group by session_id
+$$;
+
 -- ---------- Extended: marketplace (FR15, FR16) ----------
 create or replace function public.offers_before_insert() returns trigger
 language plpgsql security definer set search_path = public as $$

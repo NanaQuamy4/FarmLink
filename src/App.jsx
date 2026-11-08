@@ -11,7 +11,6 @@ import { RequireAuth, RequireRole, GuestOnly } from './app/guards'
 import Dashboard from './pages/app/Dashboard'
 import Notifications from './pages/app/Notifications'
 import Profile from './pages/app/Profile'
-import { EmptyState } from './components/ui'
 import MyPlots from './pages/app/plots/MyPlots'
 import PlotForm from './pages/app/plots/PlotForm'
 import PlotDetail from './pages/app/plots/PlotDetail'
@@ -25,6 +24,10 @@ import Deals from './pages/app/deals/Deals'
 import DealDetail from './pages/app/deals/DealDetail'
 import { DisputeList, DisputeMediation } from './pages/app/verify/Disputes'
 import { AdminUsers, AdminVerifiers, AdminPlots, AdminReports } from './pages/app/admin/Admin'
+import { GroupList, GroupDetail } from './pages/app/community/Groups'
+import { SessionList, SessionDetail } from './pages/app/community/Sessions'
+import { Marketplace, ListingDetail, MyOffers } from './pages/app/community/Market'
+import PublicProfile from './pages/app/community/PublicProfile'
 
 function NotFound() {
   return (
@@ -38,9 +41,6 @@ function NotFound() {
     </>
   )
 }
-
-// Placeholder for app pages still being built
-const Soon = ({ title }) => <EmptyState icon="bi-hammer" title={title} text="This page is being built next." />
 
 const L = ['landowner', 'admin']
 const F = ['farmer', 'admin']
@@ -62,7 +62,7 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/u/:id" element={<Soon title="Public profile" />} />
+        <Route path="/u/:id" element={<PublicProfile />} />
 
         {/* Landowner */}
         <Route path="/plots" element={<RequireRole roles={L}><MyPlots /></RequireRole>} />
@@ -96,13 +96,13 @@ export default function App() {
         <Route path="/admin/reports" element={<RequireRole roles={A}><AdminReports /></RequireRole>} />
 
         {/* Extended */}
-        <Route path="/groups" element={<Soon title="Groups" />} />
-        <Route path="/groups/:id" element={<Soon title="Group" />} />
-        <Route path="/sessions" element={<Soon title="Sessions" />} />
-        <Route path="/sessions/:id" element={<Soon title="Session" />} />
-        <Route path="/market" element={<Soon title="Marketplace" />} />
-        <Route path="/market/listings/:id" element={<Soon title="Listing" />} />
-        <Route path="/market/offers" element={<Soon title="Offers" />} />
+        <Route path="/groups" element={<GroupList />} />
+        <Route path="/groups/:id" element={<GroupDetail />} />
+        <Route path="/sessions" element={<SessionList />} />
+        <Route path="/sessions/:id" element={<SessionDetail />} />
+        <Route path="/market" element={<Marketplace />} />
+        <Route path="/market/listings/:id" element={<ListingDetail />} />
+        <Route path="/market/offers" element={<RequireRole roles={['buyer', 'admin']}><MyOffers /></RequireRole>} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
