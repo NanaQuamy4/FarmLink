@@ -3,7 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { supabase, errorMessage } from '../../../lib/supabase'
 import { useAuth } from '../../../lib/auth'
 import { useQuery } from '../../../lib/useQuery'
-import { photoUrl } from '../../../lib/storage'
+import { photoUrl, compressImage } from '../../../lib/storage'
 import { img } from '../../../lib/img'
 import { PageHeader, Loading, ErrorAlert, EmptyState, ActionButton, Field, Avatar } from '../../../components/ui'
 import { REGIONS } from '../../../lib/constants'
@@ -71,10 +71,32 @@ function SessionForm({ profile, session, onDone, onCancel }) {
     duration_minutes: session?.duration_minutes || 60, capacity: session?.capacity || 100,
   })
   const [err, setErr] = useState('')
+  const [uploading, setUploading] = useState(false)
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
+  const customCover = f.cover_image && !COVERS.some(([src]) => src === f.cover_image) ? f.cover_image : null
+
+  // Host's own cover image: compressed in the browser, stored in the public session-covers bucket
+  async function uploadCover(file) {
+    if (!file) return
+    if (!file.type.startsWith('image/')) return setErr('Choose a photo (JPG, PNG or WebP).')
+    setErr('')
+    setUploading(true)
+    try {
+      const small = await compressImage(file, 1600, 0.78)
+      const path = `${profile.id}/${crypto.randomUUID()}.jpg`
+      const { error } = await supabase.storage.from('session-covers').upload(path, small, { contentType: small.type || 'image/jpeg' })
+      if (error) throw error
+      setF((x) => ({ ...x, cover_image: supabase.storage.from('session-covers').getPublicUrl(path).data.publicUrl }))
+    } catch (e) {
+      setErr(errorMessage(e))
+    } finally {
+      setUploading(false)
+    }
+  }
 
   async function submit() {
     setErr('')
+    if (uploading) return setErr('Wait for the cover photo to finish uploading.')
     const starts = new Date(`${f.date}T${f.time}`)
     if (!f.title.trim()) return setErr('Give the session a title.')
     if (Number.isNaN(starts.getTime())) return setErr('Choose a date and time.')
@@ -113,6 +135,13 @@ function SessionForm({ profile, session, onDone, onCancel }) {
         <div className="col-12">
           <span className="form-label d-block">Cover photo</span>
           <div className="d-flex flex-wrap gap-2">
+            <label className="fl-cover-upload rounded-3" title="Upload your own cover photo"
+              style={customCover ? { outline: '3px solid var(--fl-lime)', outlineOffset: 2, backgroundImage: `url(${customCover})` } : undefined}>
+              <input type="file" accept="image/jpeg,image/png,image/webp" className="visually-hidden" disabled={uploading} onChange={(e) => uploadCover(e.target.files[0])} />
+              {uploading ? <span className="spinner-border spinner-border-sm" aria-label="Uploading" />
+                : customCover ? <span className="fl-cover-upload-change"><i className="bi bi-arrow-repeat" /> Change</span>
+                  : <><i className="bi bi-cloud-arrow-up fs-5" /><span>Upload your own</span></>}
+            </label>
             {COVERS.map(([src, label]) => (
               <button key={src} type="button" aria-label={label} aria-pressed={f.cover_image === src} onClick={() => setF({ ...f, cover_image: src })}
                 className="p-0 border-0 rounded-3 overflow-hidden" style={{ outline: f.cover_image === src ? '3px solid var(--fl-lime)' : 'none', outlineOffset: 2 }}>
@@ -120,10 +149,11 @@ function SessionForm({ profile, session, onDone, onCancel }) {
               </button>
             ))}
           </div>
+          <div className="form-text">Upload your own photo or pick one of ours. Wide photos (landscape) look best; up to 3 MB.</div>
         </div>
       </div>
       <div className="d-flex gap-2 mt-4">
-        <ActionButton className="btn btn-primary" onClick={submit}>{session ? 'Save changes' : 'Schedule session'}</ActionButton>
+        <ActionButton className="btn btn-primary" disabled={uploading} onClick={submit}>{session ? 'Save changes' : 'Schedule session'}</ActionButton>
         <button type="button" className="btn btn-outline-primary" onClick={onCancel}>Cancel</button>
       </div>
     </div>

@@ -589,3 +589,11 @@ $fl-ease: cubic-bezier(.2, .7, .2, 1);
 .fl-agenda { counter-reset: ag; list-style: none; padding: 0; display: grid; gap: .6rem;
   li { counter-increment: ag; display: flex; gap: .8rem; align-items: center; }
   li::before { content: counter(ag); flex: none; width: 1.9rem; height: 1.9rem; border-radius: 50%; display: grid; place-items: center; background: #E8F3D2; color: var(--fl-deep); font-weight: 600; font-size: .85rem; } }
+
+// Session cover upload tile (sits first in the cover picker)
+.fl-cover-upload { width: 92px; height: 62px; margin: 0; display: grid; place-items: center; align-content: center; gap: .1rem; cursor: pointer;
+  border: 2px dashed rgba($fl-field, .55); background: #F7FAF1 center / cover no-repeat; color: var(--fl-deep); font-size: .68rem; font-weight: 600; text-align: center;
+  transition: border-color .2s ease, background-color .2s ease;
+  &:hover { border-color: var(--fl-field); background-color: #EEF6E1; }
+  &:focus-within { outline: 2px solid var(--fl-field); outline-offset: 2px; } }
+.fl-cover-upload-change { background: rgba(3, 43, 31, .7); color: #fff; padding: .1rem .45rem; border-radius: 50rem; }

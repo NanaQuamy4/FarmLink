@@ -43,6 +43,7 @@ beforeAll(async () => {
   await db.exec(sql('supabase/seed.sql'))
   await db.exec(sql('supabase/migrations/0005_sessions_plus.sql'))
   await db.exec(sql('supabase/migrations/0006_support.sql'))
+  await db.exec(sql('supabase/migrations/0007_session_covers.sql'))
   for (const r of (await db.query('select id, email from auth.users')).rows) ids[r.email.split('@')[0]] = r.id
 }, 60000)
 
@@ -404,6 +405,17 @@ describe('help & support (0006)', () => {
     const r = await scenario(async ({ tx, t }) =>
       (await tx.query(`insert into support_messages (ticket_id, sender_id, body, is_staff) values ($1, auth.uid(), 'I am staff', true) returning is_staff`, [t.id])).rows[0].is_staff)
     expect(r).toBe(false)
+  })
+})
+
+describe('session cover uploads (0007)', () => {
+  const put = (who, folder) => as(who, `insert into storage.objects (bucket_id, name) values ('session-covers', $1 || '/cover.jpg') returning name`, [folder])
+  it('hosts upload into their own folder only', async () => {
+    await expect(put('officer', ids.officer)).resolves.toHaveLength(1)
+    await expect(put('officer', ids.kwame)).rejects.toThrow()
+  })
+  it('people who cannot host cannot upload covers', async () => {
+    await expect(put('kwame', ids.kwame)).rejects.toThrow()
   })
 })
 
